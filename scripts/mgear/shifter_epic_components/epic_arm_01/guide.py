@@ -72,7 +72,6 @@ class Guide(guide.ComponentGuide):
         self.pUpvRefArray = self.addParam("pinrefarray", "string", "")
         self.pMaxStretch = self.addParam("maxstretch", "double", 1.5, 1, None)
         self.pIKTR = self.addParam("ikTR", "bool", False)
-        # self.pSuptJnts = self.addParam("supportJoints", "bool", True)
         self.pMirrorMid = self.addParam("mirrorMid", "bool", False)
         self.pMirrorIK = self.addParam("mirrorIK", "bool", False)
         self.pExtraTweak = self.addParam("extraTweak", "bool", False)
@@ -96,12 +95,6 @@ class Guide(guide.ComponentGuide):
 
     def get_divisions(self):
         """ Returns correct segments divisions """
-
-        # if (self.root.hasAttr("supportJoints")
-        #         and self.root.supportJoints.get()):
-        #     ej = 2
-        # else:
-        #     ej = 0
 
         self.divisions = self.root.div0.get() + self.root.div1.get() + 3
 
@@ -166,8 +159,6 @@ class componentSettings(MayaQWidgetDockableMixin, guide.componentMainSettings):
         self.settingsTab.maxStretch_spinBox.setValue(
             self.root.attr("maxstretch").get())
         self.populateCheck(self.settingsTab.ikTR_checkBox, "ikTR")
-        # self.populateCheck(self.settingsTab.supportJoints_checkBox,
-        #                    "supportJoints")
         self.populateCheck(self.settingsTab.mirrorMid_checkBox, "mirrorMid")
         self.populateCheck(self.settingsTab.mirrorIK_checkBox, "mirrorIK")
         self.populateCheck(self.settingsTab.extraTweak_checkBox, "extraTweak")
@@ -234,11 +225,6 @@ class componentSettings(MayaQWidgetDockableMixin, guide.componentMainSettings):
 
         self.settingsTab.ikTR_checkBox.stateChanged.connect(
             partial(self.updateCheck, self.settingsTab.ikTR_checkBox, "ikTR"))
-
-        # self.settingsTab.supportJoints_checkBox.stateChanged.connect(
-        #     partial(self.updateCheck,
-        #             self.settingsTab.supportJoints_checkBox,
-        #             "supportJoints"))
 
         self.settingsTab.mirrorMid_checkBox.stateChanged.connect(
             partial(self.updateCheck,
