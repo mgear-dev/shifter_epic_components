@@ -377,12 +377,12 @@ class Component(component.Main):
         # Divisions ----------------------------------------
         # We have at least one division at the start, the end and one for the
         # elbow. + 2 for elbow angle control
-        if self.settings["supportJoints"]:
-            ej = 2
-        else:
-            ej = 0
+        # if self.settings["supportJoints"]:
+        #     ej = 2
+        # else:
+        #     ej = 0
 
-        self.divisions = self.settings["div0"] + self.settings["div1"] + 2 + ej
+        self.divisions = self.settings["div0"] + self.settings["div1"] + 2
 
         self.div_cns = []
 
@@ -862,29 +862,29 @@ class Component(component.Main):
         # controler.. and we wont have this nice tangent + roll
         for i, div_cns in enumerate(self.div_cns):
 
-            if self.settings["supportJoints"]:
-                if i < (self.settings["div0"] + 1):
-                    perc = i * .5 / (self.settings["div0"] + 1.0)
-                elif i < (self.settings["div0"] + 2):
-                    perc = .49
-                elif i < (self.settings["div0"] + 3):
-                    perc = .50
-                elif i < (self.settings["div0"] + 4):
-                    perc = .51
+            # if self.settings["supportJoints"]:
+            #     if i < (self.settings["div0"] + 1):
+            #         perc = i * .5 / (self.settings["div0"] + 1.0)
+            #     elif i < (self.settings["div0"] + 2):
+            #         perc = .49
+            #     elif i < (self.settings["div0"] + 3):
+            #         perc = .50
+            #     elif i < (self.settings["div0"] + 4):
+            #         perc = .51
 
-                else:
-                    perc = .5 + \
-                        (i - self.settings["div0"] - 3.0) * .5 / \
-                        (self.settings["div1"] + 1.0)
+            #     else:
+            #         perc = .5 + \
+            #             (i - self.settings["div0"] - 3.0) * .5 / \
+            #             (self.settings["div1"] + 1.0)
+            # else:
+            if i < (self.settings["div0"] + 1):
+                perc = i * .5 / (self.settings["div0"] + 1.0)
+            elif i < (self.settings["div0"] + 2):
+                perc = .501
             else:
-                if i < (self.settings["div0"] + 1):
-                    perc = i * .5 / (self.settings["div0"] + 1.0)
-                elif i < (self.settings["div0"] + 2):
-                    perc = .501
-                else:
-                    perc = .5 + \
-                        (i - self.settings["div0"] - 1.0) * .5 / \
-                        (self.settings["div1"] + 1.0)
+                perc = .5 + \
+                    (i - self.settings["div0"] - 1.0) * .5 / \
+                    (self.settings["div1"] + 1.0)
 
             perc = max(.001, min(.990, perc))
 
@@ -925,7 +925,7 @@ class Component(component.Main):
         """Set the relation beetween object from guide to rig"""
 
         self.relatives["root"] = self.div_cns[0]
-        self.relatives["elbow"] = self.div_cns[self.settings["div0"] + 2]
+        self.relatives["elbow"] = self.div_cns[self.settings["div0"] + 1]
         self.relatives["wrist"] = self.div_cns[-1]
         self.relatives["eff"] = self.eff_loc
 
