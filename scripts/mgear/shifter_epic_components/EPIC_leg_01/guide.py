@@ -1,7 +1,6 @@
-"""Guide Arm 2 joints 01 module"""
+"""Guide Leg 2jnt 01 module"""
 
 from functools import partial
-import pymel.core as pm
 
 from mgear.shifter.component import guide
 from mgear.core import transform, pyqt
@@ -17,11 +16,10 @@ AUTHOR = "Jeremie Passerin, Miquel Campos"
 URL = "www.jeremiepasserin.com, www.miquel-campos.com"
 EMAIL = ""
 VERSION = [1, 0, 0]
-TYPE = "EPIC_arm_01"
-NAME = "arm"
+TYPE = "EPIC_leg_01"
+NAME = "leg"
 DESCRIPTION = "Game ready component for EPIC's UE and other Game Engines\n"\
-    "Based on arm_2jnt_02"
-
+    "Based on leg_2jnt_01"
 
 ##########################################################
 # CLASS
@@ -40,28 +38,23 @@ class Guide(guide.ComponentGuide):
     email = EMAIL
     version = VERSION
 
-    connectors = ["shoulder_01"]
-
     def postInit(self):
         """Initialize the position for the guide"""
-
-        self.save_transform = ["root", "elbow", "wrist", "eff"]
+        self.save_transform = ["root", "knee", "ankle", "eff"]
 
     def addObjects(self):
         """Add the Guide Root, blade and locators"""
 
         self.root = self.addRoot()
+        vTemp = transform.getOffsetPosition(self.root, [0, -3, 0.1])
+        self.knee = self.addLoc("knee", self.root, vTemp)
+        vTemp = transform.getOffsetPosition(self.root, [0, -6, 0])
+        self.ankle = self.addLoc("ankle", self.knee, vTemp)
+        vTemp = transform.getOffsetPosition(self.root, [0, -6, .5])
+        self.eff = self.addLoc("eff", self.ankle, vTemp)
 
-        vTemp = transform.getOffsetPosition(self.root, [3, 0, -.01])
-        self.elbow = self.addLoc("elbow", self.root, vTemp)
-        vTemp = transform.getOffsetPosition(self.root, [6, 0, 0])
-        self.wrist = self.addLoc("wrist", self.elbow, vTemp)
-        vTemp = transform.getOffsetPosition(self.root, [7, 0, 0])
-        self.eff = self.addLoc("eff", self.wrist, vTemp)
-
-        self.dispcrv = self.addDispCurve(
-            "crv",
-            [self.root, self.elbow, self.wrist, self.eff])
+        centers = [self.root, self.knee, self.ankle, self.eff]
+        self.dispcrv = self.addDispCurve("crv", centers)
 
     def addParameters(self):
         """Add the configurations settings"""
@@ -72,9 +65,7 @@ class Guide(guide.ComponentGuide):
         self.pUpvRefArray = self.addParam("upvrefarray", "string", "")
         self.pUpvRefArray = self.addParam("pinrefarray", "string", "")
         self.pMaxStretch = self.addParam("maxstretch", "double", 1.5, 1, None)
-        self.pIKTR = self.addParam("ikTR", "bool", False)
         self.pMirrorMid = self.addParam("mirrorMid", "bool", False)
-        self.pMirrorIK = self.addParam("mirrorIK", "bool", False)
         self.pExtraTweak = self.addParam("extraTweak", "bool", False)
 
         # Divisions
@@ -82,17 +73,16 @@ class Guide(guide.ComponentGuide):
         self.pDiv1 = self.addParam("div1", "long", 2, 0, None)
 
         # FCurves
-        self.pSt_profile = self.addFCurveParam("st_profile",
-                                               [[0, 0], [.5, -.5], [1, 0]])
-        self.pSq_profile = self.addFCurveParam("sq_profile",
-                                               [[0, 0], [.5, .5], [1, 0]])
+        self.pSt_profile = self.addFCurveParam(
+            "st_profile", [[0, 0], [.5, -.5], [1, 0]])
+
+        self.pSq_profile = self.addFCurveParam(
+            "sq_profile", [[0, 0], [.5, .5], [1, 0]])
 
         self.pUseIndex = self.addParam("useIndex", "bool", False)
-        self.pParentJointIndex = self.addParam("parentJointIndex",
-                                               "long",
-                                               -1,
-                                               None,
-                                               None)
+
+        self.pParentJointIndex = self.addParam(
+            "parentJointIndex", "long", -1, None, None)
 
     def get_divisions(self):
         """ Returns correct segments divisions """
@@ -101,10 +91,10 @@ class Guide(guide.ComponentGuide):
 
         return self.divisions
 
-
 ##########################################################
 # Setting Page
 ##########################################################
+
 
 class settingsTab(QtWidgets.QDialog, sui.Ui_Form):
     """The Component settings UI"""
@@ -143,7 +133,7 @@ class componentSettings(MayaQWidgetDockableMixin, guide.componentMainSettings):
         return
 
     def populate_componentControls(self):
-        """Populate Controls
+        """Populate the controls values.
 
         Populate the controls values from the custom attributes of the
         component.
@@ -155,45 +145,26 @@ class componentSettings(MayaQWidgetDockableMixin, guide.componentMainSettings):
         # populate component settings
         self.settingsTab.ikfk_slider.setValue(
             int(self.root.attr("blend").get() * 100))
+
         self.settingsTab.ikfk_spinBox.setValue(
             int(self.root.attr("blend").get() * 100))
+
         self.settingsTab.maxStretch_spinBox.setValue(
             self.root.attr("maxstretch").get())
-        self.populateCheck(self.settingsTab.ikTR_checkBox, "ikTR")
+
         self.populateCheck(self.settingsTab.mirrorMid_checkBox, "mirrorMid")
-        self.populateCheck(self.settingsTab.mirrorIK_checkBox, "mirrorIK")
         self.populateCheck(self.settingsTab.extraTweak_checkBox, "extraTweak")
         self.settingsTab.div0_spinBox.setValue(self.root.attr("div0").get())
         self.settingsTab.div1_spinBox.setValue(self.root.attr("div1").get())
         ikRefArrayItems = self.root.attr("ikrefarray").get().split(",")
-
         for item in ikRefArrayItems:
             self.settingsTab.ikRefArray_listWidget.addItem(item)
-
         upvRefArrayItems = self.root.attr("upvrefarray").get().split(",")
         for item in upvRefArrayItems:
             self.settingsTab.upvRefArray_listWidget.addItem(item)
-
         pinRefArrayItems = self.root.attr("pinrefarray").get().split(",")
         for item in pinRefArrayItems:
             self.settingsTab.pinRefArray_listWidget.addItem(item)
-
-        # populate connections in main settings
-        self.c_box = self.mainSettingsTab.connector_comboBox
-        for cnx in Guide.connectors:
-            self.c_box.addItem(cnx)
-        self.connector_items = [self.c_box.itemText(i) for i in
-                                range(self.c_box.count())]
-
-        currentConnector = self.root.attr("connector").get()
-        if currentConnector not in self.connector_items:
-            self.c_box.addItem(currentConnector)
-            self.connector_items.append(currentConnector)
-            pm.displayWarning(
-                "The current connector: %s, is not a valid connector for this"
-                " component. Build will Fail!!")
-        comboIndex = self.connector_items.index(currentConnector)
-        self.c_box.setCurrentIndex(comboIndex)
 
     def create_componentLayout(self):
 
@@ -213,32 +184,25 @@ class componentSettings(MayaQWidgetDockableMixin, guide.componentMainSettings):
 
         self.settingsTab.maxStretch_spinBox.valueChanged.connect(
             partial(self.updateSpinBox,
-                    self.settingsTab.maxStretch_spinBox, "maxstretch"))
+                    self.settingsTab.maxStretch_spinBox,
+                    "maxstretch"))
 
         self.settingsTab.div0_spinBox.valueChanged.connect(
             partial(self.updateSpinBox, self.settingsTab.div0_spinBox, "div0"))
 
         self.settingsTab.div1_spinBox.valueChanged.connect(
             partial(self.updateSpinBox, self.settingsTab.div1_spinBox, "div1"))
-
         self.settingsTab.squashStretchProfile_pushButton.clicked.connect(
             self.setProfile)
 
-        self.settingsTab.ikTR_checkBox.stateChanged.connect(
-            partial(self.updateCheck, self.settingsTab.ikTR_checkBox, "ikTR"))
-
         self.settingsTab.mirrorMid_checkBox.stateChanged.connect(
             partial(self.updateCheck,
-                    self.settingsTab.mirrorMid_checkBox, "mirrorMid"))
+                    self.settingsTab.mirrorMid_checkBox,
+                    "mirrorMid"))
 
         self.settingsTab.extraTweak_checkBox.stateChanged.connect(
             partial(self.updateCheck,
                     self.settingsTab.extraTweak_checkBox, "extraTweak"))
-
-        self.settingsTab.mirrorIK_checkBox.stateChanged.connect(
-            partial(self.updateCheck,
-                    self.settingsTab.mirrorIK_checkBox,
-                    "mirrorIK"))
 
         self.settingsTab.ikRefArrayAdd_pushButton.clicked.connect(
             partial(self.addItem2listWidget,
@@ -293,11 +257,6 @@ class componentSettings(MayaQWidgetDockableMixin, guide.componentMainSettings):
                     "pinrefarray"))
 
         self.settingsTab.pinRefArray_listWidget.installEventFilter(self)
-
-        self.mainSettingsTab.connector_comboBox.currentIndexChanged.connect(
-            partial(self.updateConnector,
-                    self.mainSettingsTab.connector_comboBox,
-                    self.connector_items))
 
     def eventFilter(self, sender, event):
         if event.type() == QtCore.QEvent.ChildRemoved:
