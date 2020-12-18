@@ -1,4 +1,3 @@
-"""Guide Leg 2jnt 01 module"""
 
 from functools import partial
 

@@ -1,4 +1,3 @@
-"""Component Leg 2 joints 01 module"""
 
 import pymel.core as pm
 from pymel.core import datatypes
