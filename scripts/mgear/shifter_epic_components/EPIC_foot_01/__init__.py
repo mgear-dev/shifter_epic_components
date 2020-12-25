@@ -172,7 +172,11 @@ class Component(component.Main):
 
             self.previousTag = fk_ctl
             attribute.setKeyableAttributes(fk_ctl)
-            self.jnt_pos.append([fk_ctl, "ball"])
+            if i:
+                name = "ball" + str(i)
+            else:
+                name = "ball"
+            self.jnt_pos.append([fk_ctl, name])
 
             parent = fk_ctl
             self.fk_ctl.append(fk_ctl)
@@ -297,8 +301,8 @@ class Component(component.Main):
                 -bk_loc.getAttr("rz") - fk_loc.getAttr("rz"))
 
             neg_node = node.createMulNode([addx_node + ".output",
-                                          addy_node + ".output",
-                                          addz_node + ".output"],
+                                           addy_node + ".output",
+                                           addz_node + ".output"],
                                           [-1, -1, -1])
             ik_outputs = [neg_node + ".outputX",
                           neg_node + ".outputY",
