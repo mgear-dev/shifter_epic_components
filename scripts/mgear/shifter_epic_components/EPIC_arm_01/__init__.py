@@ -431,44 +431,44 @@ class Component(component.Main):
         # self.jnt_pos.append([self.eff_loc, 'hand', "1"])
 
         # match IK FK references
-        self.match_fk0_off = primitive.addTransform(
-            self.root,
-            self.getName("matchFk0_npo"),
-            transform.getTransform(self.fk_ctl[1]))
-        self.match_fk0 = primitive.addTransform(
-            self.match_fk0_off,
-            self.getName("fk0_mth"),
-            transform.getTransform(self.fk_ctl[0]))
-        self.match_fk1_off = primitive.addTransform(
-            self.root, self.getName(
-                "matchFk1_npo"), transform.getTransform(self.fk_ctl[2]))
-        self.match_fk1 = primitive.addTransform(
-            self.match_fk1_off,
-            self.getName("fk1_mth"),
-            transform.getTransform(self.fk_ctl[1]))
+        self.match_fk0_off = self.add_match_ref(self.fk_ctl[1],
+                                                self.root,
+                                                "matchFk0_npo",
+                                                False)
+
+        self.match_fk0 = self.add_match_ref(self.fk_ctl[0],
+                                            self.match_fk0_off,
+                                            "fk0_mth")
+
+        self.match_fk1_off = self.add_match_ref(self.fk_ctl[2],
+                                                self.root,
+                                                "matchFk1_npo",
+                                                False)
+
+        self.match_fk1 = self.add_match_ref(self.fk_ctl[1],
+                                            self.match_fk1_off,
+                                            "fk1_mth")
 
         if self.settings["ikTR"]:
             reference = self.ikRot_ctl
-            self.match_ikRot = primitive.addTransform(
-                self.fk2_ctl,
-                self.getName("ikRot_mth"),
-                transform.getTransform(self.ikRot_ctl))
+
+            self.match_ikRot = self.add_match_ref(self.ikRot_ctl,
+                                                  self.fk2_ctl,
+                                                  "ikRot_mth")
         else:
             reference = self.ik_ctl
 
-        self.match_fk2 = primitive.addTransform(
-            reference,
-            self.getName("fk2_mth"),
-            transform.getTransform(self.fk_ctl[2]))
+        self.match_fk2 = self.add_match_ref(self.fk_ctl[2],
+                                            reference,
+                                            "fk2_mth")
 
-        self.match_ik = primitive.addTransform(
-            self.fk2_ctl,
-            self.getName("ik_mth"),
-            transform.getTransform(self.ik_ctl))
-        self.match_ikUpv = primitive.addTransform(
-            self.fk0_ctl,
-            self.getName("upv_mth"),
-            transform.getTransform(self.upv_ctl))
+        self.match_ik = self.add_match_ref(self.ik_ctl,
+                                           self.fk2_ctl,
+                                           "ik_mth")
+
+        self.match_ikUpv = self.add_match_ref(self.upv_ctl,
+                                              self.fk0_ctl,
+                                              "upv_mth")
 
         # add visual reference
         self.line_ref = icon.connection_display_curve(
