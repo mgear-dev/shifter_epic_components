@@ -69,8 +69,10 @@ class Guide(guide.ComponentGuide):
         self.dispcrv = self.addDispCurve("crv", centers, 3)
 
         # tangent handles
-        self.disp_tancrv0 = self.addDispCurve("crvTan0", [self.root, self.tan0])
-        self.disp_tancrv1 = self.addDispCurve("crvTan1", [self.eff, self.tan1])
+        self.disp_tancrv0 = self.addDispCurve(
+            "crvTan0", [self.root, self.tan0])
+        self.disp_tancrv1 = self.addDispCurve(
+            "crvTan1", [self.eff, self.tan1])
 
     def addParameters(self):
         """Add the configurations settings"""
