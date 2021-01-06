@@ -150,7 +150,8 @@ class Component(component.Main):
         self.twister = []
         self.ref_twist = []
 
-        self.divisions = self.settings["division"]
+        # adding 1 for the head
+        self.divisions = (self.settings["division"] + 1)
 
         parent_twistRef = primitive.addTransform(
             self.root,
@@ -217,7 +218,9 @@ class Component(component.Main):
             self.fk_npo.append(fk_npo)
             parentctl = fk_ctl
 
-            self.jnt_pos.append([fk_ctl, i])
+            # self.jnt_pos.append([fk_ctl, i])
+            if i != self.divisions - 1:
+                self.jnt_pos.append([fk_ctl, "neck_" + str(i + 1).zfill(2)])
 
             t = transform.getTransformLookingAt(
                 self.guide.pos["root"],
