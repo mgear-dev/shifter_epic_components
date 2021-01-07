@@ -11,7 +11,7 @@ import settingsUI as sui
 
 # guide info
 AUTHOR = "Jeremie Passerin, Miquel Campos"
-URL = "www.jeremiepasserin.com, www.miquletd.com"
+URL = "www.jeremiepasserin.com, www.miquel-campos.com"
 EMAIL = ""
 VERSION = [1, 0, 0]
 TYPE = "EPIC_neck_01"
