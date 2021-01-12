@@ -364,17 +364,19 @@ class Component(component.Main):
                 current_parent = "root"
                 twist_name = "thigh_twist_"
                 twist_idx = 1
+                increment = 1
             elif i == self.settings["div0"] + 1:
                 self.jnt_pos.append([driver, "calf", current_parent])
                 twist_name = "calf_twist_"
                 current_parent = "knee"
-                twist_idx = 1
+                twist_idx = self.settings["div1"]
+                increment = -1
             else:
                 self.jnt_pos.append(
                     [driver,
                      twist_name + str(twist_idx).zfill(2),
                      current_parent])
-                twist_idx += 1
+                twist_idx += increment
 
         # End reference ------------------------------------
         # To help the deformation on the ankle
