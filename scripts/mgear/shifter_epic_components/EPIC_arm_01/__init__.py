@@ -295,6 +295,12 @@ class Component(component.Main):
         self.eff_loc = primitive.addTransformFromPos(self.root,
                                                      self.getName("eff_loc"),
                                                      self.guide.apos[2])
+        # set the offset rotation for the hand
+        self.eff_jnt_off = primitive.addTransformFromPos(
+            self.eff_loc,
+            self.getName("eff_off"),
+            self.guide.apos[2])
+        self.eff_jnt_off.rx.set(-90)
 
         # Mid Controler ------------------------------------
         t = transform.getTransform(self.ctrn_loc)
@@ -415,19 +421,21 @@ class Component(component.Main):
                 current_parent = "root"
                 twist_name = "upperarm_twist_"
                 twist_idx = 1
+                increment = 1
             elif i == self.settings["div0"] + 1:
                 self.jnt_pos.append([driver, "lowerarm", current_parent])
                 twist_name = "lowerarm_twist_"
                 current_parent = "elbow"
-                twist_idx = 1
+                twist_idx = self.settings["div1"]
+                increment = -1
             else:
                 self.jnt_pos.append(
                     [driver,
                      twist_name + str(twist_idx).zfill(2),
                      current_parent])
-                twist_idx += 1
+                twist_idx += increment
 
-        self.jnt_pos.append([self.eff_loc, 'hand', current_parent])
+        self.jnt_pos.append([self.eff_jnt_off, 'hand', current_parent])
         # self.jnt_pos.append([self.eff_loc, 'hand', "1"])
 
         # match IK FK references
