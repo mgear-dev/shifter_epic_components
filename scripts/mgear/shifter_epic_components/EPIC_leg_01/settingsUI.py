@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'C:/datawork/repo/shifter_epic_components/scripts/mgear/shifter_epic_components/EPIC_leg_01/settingsUI.ui',
 # licensing of 'C:/datawork/repo/shifter_epic_components/scripts/mgear/shifter_epic_components/EPIC_leg_01/settingsUI.ui' applies.
 #
-# Created: Fri Dec 18 10:01:57 2020
+# Created: Thu Jan 14 06:24:02 2021
 #      by: pyside2-uic  running on PySide2 5.12.5
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,7 +13,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(255, 799)
+        Form.resize(254, 799)
         self.gridLayout = QtWidgets.QGridLayout(Form)
         self.gridLayout.setObjectName("gridLayout")
         self.groupBox = QtWidgets.QGroupBox(Form)
@@ -83,6 +83,9 @@ class Ui_Form(object):
         self.extraTweak_checkBox = QtWidgets.QCheckBox(self.groupBox)
         self.extraTweak_checkBox.setObjectName("extraTweak_checkBox")
         self.verticalLayout.addWidget(self.extraTweak_checkBox)
+        self.TPoseRest_checkBox = QtWidgets.QCheckBox(self.groupBox)
+        self.TPoseRest_checkBox.setObjectName("TPoseRest_checkBox")
+        self.verticalLayout.addWidget(self.TPoseRest_checkBox)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.squashStretchProfile_pushButton = QtWidgets.QPushButton(self.groupBox)
@@ -212,6 +215,10 @@ class Ui_Form(object):
         self.extraTweak_checkBox.setStatusTip(QtWidgets.QApplication.translate("Form", "This option set the axis of the mid CTL (elbow) and the up vector control to move in a mirror behaviour ", None, -1))
         self.extraTweak_checkBox.setWhatsThis(QtWidgets.QApplication.translate("Form", "This option set the axis of the mid CTL (elbow) and the up vector control to move in a mirror behaviour ", None, -1))
         self.extraTweak_checkBox.setText(QtWidgets.QApplication.translate("Form", "Add Extra Tweak Ctl", None, -1))
+        self.TPoseRest_checkBox.setToolTip(QtWidgets.QApplication.translate("Form", "<html><head/><body><p>If checked, the Rest pose for  FK controls will be in T Pose</p></body></html>", None, -1))
+        self.TPoseRest_checkBox.setStatusTip(QtWidgets.QApplication.translate("Form", "This option set the axis of the mid CTL (elbow) and the up vector control to move in a mirror behaviour ", None, -1))
+        self.TPoseRest_checkBox.setWhatsThis(QtWidgets.QApplication.translate("Form", "This option set the axis of the mid CTL (elbow) and the up vector control to move in a mirror behaviour ", None, -1))
+        self.TPoseRest_checkBox.setText(QtWidgets.QApplication.translate("Form", "FK Rest T Pose", None, -1))
         self.squashStretchProfile_pushButton.setText(QtWidgets.QApplication.translate("Form", "Squash and Stretch Profile", None, -1))
         self.ikRefArray_groupBox.setTitle(QtWidgets.QApplication.translate("Form", "IK Reference Array", None, -1))
         self.ikRefArray_copyRef_pushButton.setText(QtWidgets.QApplication.translate("Form", "Copy from UpV Ref", None, -1))

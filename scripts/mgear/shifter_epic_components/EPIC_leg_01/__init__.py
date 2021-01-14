@@ -65,9 +65,23 @@ class Component(component.Main):
                                             self.normal,
                                             "xz",
                                             self.negate)
+        if self.settings["FK_rest_T_Pose"]:
+            if self.negate:
+                x_dir = 1
+            else:
+                x_dir = -1
+
+            x = datatypes.Vector(0, x_dir, 0)
+            z = datatypes.Vector(-1, 0, 0)
+
+            t_npo = transform.getRotationFromAxis(x, z, "xz", False)
+            t_npo = transform.setMatrixPosition(t_npo, self.guide.apos[0])
+        else:
+            t_npo = t
+
         self.fk0_npo = primitive.addTransform(self.root_ctl,
                                               self.getName("fk0_npo"),
-                                              t)
+                                              t_npo)
         po_vec = datatypes.Vector(.5 * self.length0 * self.n_factor, 0, 0)
         self.fk0_ctl = self.addCtl(self.fk0_npo,
                                    "fk0_ctl",
@@ -88,8 +102,14 @@ class Component(component.Main):
                                             "xz",
                                             self.negate)
 
+        if self.settings["FK_rest_T_Pose"]:
+            t_npo = transform.setMatrixPosition(
+                transform.getTransform(self.fk0_ctl), self.guide.apos[1])
+        else:
+            t_npo = t
+
         self.fk1_npo = primitive.addTransform(
-            self.fk0_ctl, self.getName("fk1_npo"), t)
+            self.fk0_ctl, self.getName("fk1_npo"), t_npo)
 
         po_vec = datatypes.Vector(.5 * self.length1 * self.n_factor, 0, 0)
         self.fk1_ctl = self.addCtl(self.fk1_npo,
@@ -149,16 +169,24 @@ class Component(component.Main):
             tp=self.root_ctl)
         attribute.setInvertMirror(self.ikcns_ctl, ["tx"])
 
-        m = transform.getTransformLookingAt(self.guide.pos["ankle"],
-                                            self.guide.pos["eff"],
-                                            self.x_axis,
-                                            "zx",
-                                            False)
+        # m = transform.getTransformLookingAt(self.guide.pos["ankle"],
+        #                                     self.guide.pos["eff"],
+        #                                     self.x_axis,
+        #                                     "zx",
+        #                                     False)
+        if self.settings["FK_rest_T_Pose"]:
+            t_ik = transform.getTransformLookingAt(self.guide.pos["ankle"],
+                                                   self.guide.pos["eff"],
+                                                   self.normal * -1,
+                                                   "zx",
+                                                   False)
+        else:
+            t_ik = transform.getTransformFromPos(self.guide.pos["ankle"])
 
         self.ik_ctl = self.addCtl(
             self.ikcns_ctl,
             "ik_ctl",
-            transform.getTransformFromPos(self.guide.pos["ankle"]),
+            t_ik,
             self.color_ik,
             "cube",
             w=self.size * .12,

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>242</width>
-    <height>676</height>
+    <height>699</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -175,6 +175,22 @@
           </property>
           <property name="text">
            <string>Add Extra Tweak Ctl</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="TPoseRest_checkBox">
+          <property name="toolTip">
+           <string extracomment="This option set the axis of the mid CTL (elbow) and the up vector control to move in a mirror behaviour ">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked, the Rest pose for  FK controls will be in T Pose&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="statusTip">
+           <string extracomment="This option set the axis of the mid CTL (elbow) and the up vector control to move in a mirror behaviour ">This option set the axis of the mid CTL (elbow) and the up vector control to move in a mirror behaviour </string>
+          </property>
+          <property name="whatsThis">
+           <string>This option set the axis of the mid CTL (elbow) and the up vector control to move in a mirror behaviour </string>
+          </property>
+          <property name="text">
+           <string>FK Rest T Pose</string>
           </property>
          </widget>
         </item>

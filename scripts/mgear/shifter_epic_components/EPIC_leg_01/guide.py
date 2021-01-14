@@ -66,6 +66,7 @@ class Guide(guide.ComponentGuide):
         self.pMaxStretch = self.addParam("maxstretch", "double", 1.5, 1, None)
         self.pMirrorMid = self.addParam("mirrorMid", "bool", False)
         self.pExtraTweak = self.addParam("extraTweak", "bool", False)
+        self.pTPoseRest = self.addParam("FK_rest_T_Pose", "bool", False)
 
         # Divisions
         self.pDiv0 = self.addParam("div0", "long", 2, 0, None)
@@ -153,6 +154,8 @@ class componentSettings(MayaQWidgetDockableMixin, guide.componentMainSettings):
 
         self.populateCheck(self.settingsTab.mirrorMid_checkBox, "mirrorMid")
         self.populateCheck(self.settingsTab.extraTweak_checkBox, "extraTweak")
+        self.populateCheck(self.settingsTab.TPoseRest_checkBox,
+                           "FK_rest_T_Pose")
         self.settingsTab.div0_spinBox.setValue(self.root.attr("div0").get())
         self.settingsTab.div1_spinBox.setValue(self.root.attr("div1").get())
         ikRefArrayItems = self.root.attr("ikrefarray").get().split(",")
@@ -202,6 +205,10 @@ class componentSettings(MayaQWidgetDockableMixin, guide.componentMainSettings):
         self.settingsTab.extraTweak_checkBox.stateChanged.connect(
             partial(self.updateCheck,
                     self.settingsTab.extraTweak_checkBox, "extraTweak"))
+
+        self.settingsTab.TPoseRest_checkBox.stateChanged.connect(
+            partial(self.updateCheck,
+                    self.settingsTab.TPoseRest_checkBox, "FK_rest_T_Pose"))
 
         self.settingsTab.ikRefArrayAdd_pushButton.clicked.connect(
             partial(self.addItem2listWidget,

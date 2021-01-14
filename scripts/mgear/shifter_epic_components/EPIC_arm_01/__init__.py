@@ -49,10 +49,23 @@ class Component(component.Main):
                                             self.normal, "xz",
                                             self.negate)
 
+        if self.settings["FK_rest_T_Pose"]:
+            x = datatypes.Vector(1, 0, 0)
+            if self.negate:
+                z_dir = -1
+            else:
+                z_dir = 1
+
+            z = datatypes.Vector(0, z_dir, 0)
+
+            t_npo = transform.getRotationFromAxis(x, z, "xz", False )
+            t_npo = transform.setMatrixPosition(t_npo, self.guide.apos[0])
+        else:
+            t_npo = t
+
         self.fk0_npo = primitive.addTransform(self.root,
                                               self.getName("fk0_npo"),
-                                              t)
-
+                                              t_npo)
         vec_po = datatypes.Vector(.5 * self.length0 * self.n_factor, 0, 0)
         self.fk0_ctl = self.addCtl(self.fk0_npo,
                                    "fk0_ctl",
@@ -75,9 +88,16 @@ class Component(component.Main):
                                             "xz",
                                             self.negate)
 
+        if self.settings["FK_rest_T_Pose"]:
+            t_npo = transform.setMatrixPosition(
+                transform.getTransform(self.fk0_ctl), self.guide.apos[1])
+        else:
+            t_npo = t
+
         self.fk1_npo = primitive.addTransform(self.fk0_ctl,
                                               self.getName("fk1_npo"),
-                                              t)
+                                              t_npo)
+
         vec_po = datatypes.Vector(.5 * self.length1 * self.n_factor, 0, 0)
         self.fk1_ctl = self.addCtl(self.fk1_npo,
                                    "fk1_ctl",
@@ -100,9 +120,15 @@ class Component(component.Main):
                                             "xz",
                                             self.negate)
 
+        if self.settings["FK_rest_T_Pose"]:
+            t_npo = transform.setMatrixPosition(
+                transform.getTransform(self.fk0_ctl), self.guide.apos[2])
+        else:
+            t_npo = t
+
         self.fk2_npo = primitive.addTransform(self.fk1_ctl,
                                               self.getName("fk2_npo"),
-                                              t)
+                                              t_npo)
 
         vec_po = datatypes.Vector(.5 * self.length2 * self.n_factor, 0, 0)
         self.fk2_ctl = self.addCtl(self.fk2_npo,
