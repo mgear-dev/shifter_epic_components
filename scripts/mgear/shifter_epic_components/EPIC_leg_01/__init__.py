@@ -72,7 +72,10 @@ class Component(component.Main):
             else:
                 x_dir = -1
 
-            x = datatypes.Vector(0, x_dir, 0)
+            if self.up_axis == "y":
+                x = datatypes.Vector(0, x_dir, 0)
+            else:
+                x = datatypes.Vector(0, 0, x_dir)
             z = datatypes.Vector(-1, 0, 0)
 
             t_npo = transform.getRotationFromAxis(x, z, "xz", False)

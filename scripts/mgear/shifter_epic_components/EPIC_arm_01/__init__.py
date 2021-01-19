@@ -22,6 +22,7 @@ class Component(component.Main):
         """Add all the objects needed to create the component."""
 
         self.WIP = self.options["mode"]
+        self.up_axis = pm.upAxis(q=True, axis=True)
 
         self.normal = self.getNormalFromPos(self.guide.apos)
         self.binormal = self.getBiNormalFromPos(self.guide.apos)
@@ -56,7 +57,10 @@ class Component(component.Main):
             else:
                 z_dir = 1
 
-            z = datatypes.Vector(0, z_dir, 0)
+            if self.up_axis == "y":
+                z = datatypes.Vector(0, z_dir, 0)
+            else:
+                z = datatypes.Vector(0, 0, z_dir)
 
             t_npo = transform.getRotationFromAxis(x, z, "xz", False)
             t_npo = transform.setMatrixPosition(t_npo, self.guide.apos[0])
