@@ -22,6 +22,7 @@ class Component(component.Main):
         """Add all the objects needed to create the component."""
 
         self.WIP = self.options["mode"]
+        self.up_axis = pm.upAxis(q=True, axis=True)
 
         self.normal = self.getNormalFromPos(self.guide.apos)
 
@@ -410,8 +411,12 @@ class Component(component.Main):
         # To help the deformation on the ankle
         self.end_ref = primitive.addTransform(self.tws2_rot,
                                               self.getName("end_ref"), m)
-        # self.jnt_pos.append([self.end_ref, 'end'])
-        self.jnt_pos.append([self.end_ref, 'foot', current_parent])
+        # set the offset rotation for the hand
+        self.end_jnt_off = primitive.addTransform(self.end_ref,
+                                                  self.getName("end_off"), m)
+        if self.up_axis == "z":
+            self.end_jnt_off.rz.set(-90)
+        self.jnt_pos.append([self.end_jnt_off, 'foot', current_parent])
 
         # match IK FK references
         self.match_fk0_off = self.add_match_ref(self.fk_ctl[1],

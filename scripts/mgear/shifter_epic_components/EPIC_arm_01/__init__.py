@@ -58,7 +58,7 @@ class Component(component.Main):
 
             z = datatypes.Vector(0, z_dir, 0)
 
-            t_npo = transform.getRotationFromAxis(x, z, "xz", False )
+            t_npo = transform.getRotationFromAxis(x, z, "xz", False)
             t_npo = transform.setMatrixPosition(t_npo, self.guide.apos[0])
         else:
             t_npo = t
