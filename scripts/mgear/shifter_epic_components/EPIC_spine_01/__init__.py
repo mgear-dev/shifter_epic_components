@@ -20,6 +20,8 @@ class Component(component.Main):
     def addObjects(self):
         """Add all the objects needed to create the component."""
 
+        self.up_axis = pm.upAxis(q=True, axis=True)
+
         # Auto bend with position controls  -------------------
         if self.settings["autoBend"]:
             self.autoBendChain = primitive.add2DChain(
@@ -44,9 +46,17 @@ class Component(component.Main):
                 self.guide.blades["blade"].z * -1,
                 "yx",
                 self.negate)
+        self.ik_off = primitive.addTransform(
+            self.root,
+            self.getName("ik_off"),
+            t)
+        # handle Z up orientation offset
+        if self.up_axis == "z" and self.settings["IKWorldOri"]:
+            self.ik_off.rx.set(90)
+            t = transform.getTransform(self.ik_off)
 
         self.ik0_npo = primitive.addTransform(
-            self.root, self.getName("ik0_npo"), t)
+            self.ik_off, self.getName("ik0_npo"), t)
 
         self.ik0_ctl = self.addCtl(
             self.ik0_npo,
@@ -282,6 +292,14 @@ class Component(component.Main):
 
         self.jointList = []
         self.preiviousCtlTag = self.parentCtlTag
+        # handle Z up orientation offset
+        # parentctl = primitive.addTransform(
+        #     parentctl,
+        #     self.getName("fk0_off"),
+        #     transform.getTransform(parentctl))
+        # if self.up_axis == "z":
+        #     parentctl.rx.set(90)
+
         for i in range(self.settings["division"]):
 
             # References

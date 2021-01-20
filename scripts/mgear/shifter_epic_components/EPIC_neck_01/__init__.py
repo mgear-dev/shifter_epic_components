@@ -21,6 +21,7 @@ class Component(component.Main):
         """Add all the objects needed to create the component."""
 
         self.normal = self.guide.blades["blade"].z * -1
+        self.up_axis = pm.upAxis(q=True, axis=True)
 
         # Ik Controlers ------------------------------------
         if self.settings["IKWorldOri"]:
@@ -34,8 +35,17 @@ class Component(component.Main):
 
         t = transform.setMatrixPosition(t, self.guide.pos["neck"])
 
+        self.ik_off = primitive.addTransform(
+            self.root,
+            self.getName("ik_off"),
+            t)
+        # handle Z up orientation offset
+        if self.up_axis == "z" and self.settings["IKWorldOri"]:
+            self.ik_off.rx.set(90)
+            t = transform.getTransform(self.ik_off)
+
         self.ik_cns = primitive.addTransform(
-            self.root, self.getName("ik_cns"), t)
+            self.ik_off, self.getName("ik_cns"), t)
 
         self.ik_ctl = self.addCtl(self.ik_cns,
                                   "ik_ctl",
