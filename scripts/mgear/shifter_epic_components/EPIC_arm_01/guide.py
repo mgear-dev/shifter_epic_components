@@ -45,6 +45,7 @@ class Guide(guide.ComponentGuide):
         """Initialize the position for the guide"""
 
         self.save_transform = ["root", "elbow", "wrist", "eff"]
+        self.save_blade = ["blade"]
 
     def addObjects(self):
         """Add the Guide Root, blade and locators"""
@@ -61,6 +62,8 @@ class Guide(guide.ComponentGuide):
         self.dispcrv = self.addDispCurve(
             "crv",
             [self.root, self.elbow, self.wrist, self.eff])
+
+        self.blade = self.addBlade("blade", self.wrist, self.eff)
 
     def addParameters(self):
         """Add the configurations settings"""

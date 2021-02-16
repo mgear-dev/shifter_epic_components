@@ -24,6 +24,9 @@ class Component(component.Main):
         self.WIP = self.options["mode"]
         self.up_axis = pm.upAxis(q=True, axis=True)
 
+        self.blade_normal = self.guide.blades["blade"].z * -1
+        self.blade_binormal = self.guide.blades["blade"].x
+
         self.normal = self.getNormalFromPos(self.guide.apos)
         self.binormal = self.getBiNormalFromPos(self.guide.apos)
 
@@ -326,11 +329,15 @@ class Component(component.Main):
                                                      self.getName("eff_loc"),
                                                      self.guide.apos[2])
         # set the offset rotation for the hand
-        self.eff_jnt_off = primitive.addTransformFromPos(
+        self.off_t = transform.getTransformLookingAt(self.guide.pos["wrist"],
+                                                     self.guide.pos["eff"],
+                                                     self.blade_normal,
+                                                     axis="xy",
+                                                     negate=self.negate)
+        self.eff_jnt_off = primitive.addTransform(
             self.eff_loc,
             self.getName("eff_off"),
-            self.guide.apos[2])
-        self.eff_jnt_off.rx.set(-90)
+            self.off_t)
 
         # Mid Controler ------------------------------------
         t = transform.getTransform(self.ctrn_loc)
@@ -930,6 +937,9 @@ class Component(component.Main):
         if self.settings["ikTR"]:
             transform.matchWorldTransform(self.ikRot_ctl, self.match_ikRot)
             transform.matchWorldTransform(self.fk_ctl[2], self.match_fk2)
+
+        # recover hand offset transform
+        self.eff_jnt_off.setMatrix(self.off_t, worldSpace=True)
 
         return
 
