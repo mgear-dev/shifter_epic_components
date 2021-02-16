@@ -16,6 +16,8 @@ class Component(component.Main):
     def addObjects(self):
         """Add all the objects needed to create the component."""
 
+        self.up_axis = pm.upAxis(q=True, axis=True)
+
         self.div_count = len(self.guide.apos) - 5
 
         plane = [self.guide.apos[0], self.guide.apos[-4], self.guide.apos[-3]]
@@ -116,9 +118,9 @@ class Component(component.Main):
                 t = transform.getTransform(self.heel_ctl)
                 t = transform.setMatrixPosition(t, pos)
             else:
-                dir = bk_pos[i - 1]
+                direction = bk_pos[i - 1]
                 t = transform.getTransformLookingAt(
-                    pos, dir, self.normal, "xz", self.negate)
+                    pos, direction, self.normal, "xz", self.negate)
 
             bk_loc = primitive.addTransform(
                 parent, self.getName("bk%s_loc" % i), t)
@@ -151,7 +153,10 @@ class Component(component.Main):
         parent = self.fk_npo
         self.previousTag = self.tip_ctl
         for i, bk_ctl in enumerate(reversed(self.bk_ctl[1:])):
-            t = transform.getTransform(bk_ctl)
+            if i == len(self.bk_ctl) - 2:
+                t = transform.getTransform(self.tip_ctl)
+            else:
+                t = transform.getTransform(bk_ctl)
             dist = vector.getDistance(self.guide.apos[i + 1],
                                       self.guide.apos[i + 2])
 
