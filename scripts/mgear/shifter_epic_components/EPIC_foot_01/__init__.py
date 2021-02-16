@@ -68,9 +68,14 @@ class Component(component.Main):
         attribute.setKeyableAttributes(self.heel_ctl, self.r_params)
 
         # Tip ----------------------------------------------
-        v = datatypes.Vector(self.guide.apos[-5].x,
-                             self.guide.apos[-1].y,
-                             self.guide.apos[-5].z)
+        if self.up_axis == "y":
+            v = datatypes.Vector(self.guide.apos[-5].x,
+                                 self.guide.pos["heel"].y,
+                                 self.guide.apos[-5].z)
+        else:
+            v = datatypes.Vector(self.guide.apos[-5].x,
+                                 self.guide.apos[-5].y,
+                                 self.guide.pos["heel"].z)
         t = transform.setMatrixPosition(t, v)
         self.tip_ctl = self.addCtl(self.heel_ctl,
                                    "tip_ctl",
@@ -155,6 +160,8 @@ class Component(component.Main):
         for i, bk_ctl in enumerate(reversed(self.bk_ctl[1:])):
             if i == len(self.bk_ctl) - 2:
                 t = transform.getTransform(self.tip_ctl)
+                v = transform.getTranslation(bk_ctl)
+                t = transform.setMatrixPosition(t, v)
             else:
                 t = transform.getTransform(bk_ctl)
             dist = vector.getDistance(self.guide.apos[i + 1],
