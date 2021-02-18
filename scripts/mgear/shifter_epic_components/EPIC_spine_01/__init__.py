@@ -27,7 +27,7 @@ class Component(component.Main):
             self.autoBendChain = primitive.add2DChain(
                 self.root,
                 self.getName("autoBend%s_jnt"),
-                [self.guide.apos[0], self.guide.apos[-1]],
+                [self.guide.apos[1], self.guide.apos[-2]],
                 self.guide.blades["blade"].z * -1,
                 False,
                 True)
@@ -38,11 +38,11 @@ class Component(component.Main):
         # Ik Controlers ------------------------------------
         if self.settings["IKWorldOri"]:
             t = datatypes.TransformationMatrix()
-            t = transform.setMatrixPosition(t, self.guide.apos[0])
+            t = transform.setMatrixPosition(t, self.guide.apos[1])
         else:
             t = transform.getTransformLookingAt(
-                self.guide.apos[0],
-                self.guide.apos[-1],
+                self.guide.apos[1],
+                self.guide.apos[-2],
                 self.guide.blades["blade"].z * -1,
                 "yx",
                 self.negate)
@@ -74,12 +74,12 @@ class Component(component.Main):
 
         # hip base joint
         # TODO: add option in setting for on/off
-        if True:
-            self.hip_lvl = primitive.addTransform(
-                self.ik0_ctl, self.getName("hip_lvl"), t)
-            self.jnt_pos.append([self.hip_lvl, "pelvis"])
+        # if True:
+        #     self.hip_lvl = primitive.addTransform(
+        #         self.ik0_ctl, self.getName("hip_lvl"), t)
+        #     self.jnt_pos.append([self.hip_lvl, "pelvis"])
 
-        t = transform.setMatrixPosition(t, self.guide.apos[-1])
+        t = transform.setMatrixPosition(t, self.guide.apos[-2])
         if self.settings["autoBend"]:
             self.autoBend_npo = primitive.addTransform(
                 self.root, self.getName("spinePosition_npo"), t)
@@ -116,7 +116,7 @@ class Component(component.Main):
                 tp=self.autoBend_ctl
             )
         else:
-            t = transform.setMatrixPosition(t, self.guide.apos[-1])
+            t = transform.setMatrixPosition(t, self.guide.apos[-2])
             self.ik1_npo = primitive.addTransform(
                 self.root, self.getName("ik1_npo"), t)
 
@@ -136,9 +136,6 @@ class Component(component.Main):
 
         # Tangent controllers -------------------------------
         if self.settings["centralTangent"]:
-            # vec_pos = vector.linearlyInterpolate(self.guide.apos[0],
-            #                                      self.guide.apos[-1],
-            #                                      .33)
             vec_pos = self.guide.pos["tan0"]
             t = transform.setMatrixPosition(t, vec_pos)
 
@@ -159,9 +156,6 @@ class Component(component.Main):
             )
 
             attribute.setKeyableAttributes(self.tan0_ctl, self.t_params)
-            # vec_pos = vector.linearlyInterpolate(self.guide.apos[0],
-            #                                      self.guide.apos[-1],
-            #                                      .66)
             vec_pos = self.guide.pos["tan1"]
             t = transform.setMatrixPosition(t, vec_pos)
 
@@ -184,8 +178,8 @@ class Component(component.Main):
             attribute.setKeyableAttributes(self.tan1_ctl, self.t_params)
 
             # Tangent mid control
-            vec_pos = vector.linearlyInterpolate(self.guide.apos[0],
-                                                 self.guide.apos[-1],
+            vec_pos = vector.linearlyInterpolate(self.guide.apos[1],
+                                                 self.guide.apos[-2],
                                                  .5)
             t = transform.setMatrixPosition(t, vec_pos)
 
@@ -206,9 +200,6 @@ class Component(component.Main):
             attribute.setInvertMirror(self.tan_ctl, ["tx"])
 
         else:
-            # vec_pos = vector.linearlyInterpolate(self.guide.apos[0],
-            #                                      self.guide.apos[-1],
-            #                                      .33)
             vec_pos = self.guide.pos["tan0"]
             t = transform.setMatrixPosition(t, vec_pos)
 
@@ -227,9 +218,6 @@ class Component(component.Main):
 
             attribute.setKeyableAttributes(self.tan0_ctl, self.t_params)
 
-            # vec_pos = vector.linearlyInterpolate(self.guide.apos[0],
-            #                                      self.guide.apos[-1],
-            #                                      .66)
             vec_pos = self.guide.pos["tan1"]
             t = transform.setMatrixPosition(t, vec_pos)
 
@@ -279,8 +267,8 @@ class Component(component.Main):
         self.ref_twist = []
 
         t = transform.getTransformLookingAt(
-            self.guide.apos[0],
-            self.guide.apos[-1],
+            self.guide.apos[1],
+            self.guide.apos[-2],
             self.guide.blades["blade"].z * -1,
             "yx",
             self.negate)
@@ -292,13 +280,6 @@ class Component(component.Main):
 
         self.jointList = []
         self.preiviousCtlTag = self.parentCtlTag
-        # handle Z up orientation offset
-        # parentctl = primitive.addTransform(
-        #     parentctl,
-        #     self.getName("fk0_off"),
-        #     transform.getTransform(parentctl))
-        # if self.up_axis == "z":
-        #     parentctl.rx.set(90)
 
         for i in range(self.settings["division"]):
 
@@ -366,7 +347,7 @@ class Component(component.Main):
             # slerp solver behavior)
             t = transform.getTransformLookingAt(
                 self.guide.apos[0],
-                self.guide.apos[-1],
+                self.guide.apos[1],
                 self.guide.blades["blade"].z * -1,
                 "yx",
                 self.negate)
@@ -376,7 +357,6 @@ class Component(component.Main):
 
             ref_twist = primitive.addTransform(
                 parent_twistRef, self.getName("%s_pos_ref" % i), t)
-
             ref_twist.setTranslation(
                 datatypes.Vector(1.0, 0, 0), space="preTransform")
 
@@ -497,7 +477,7 @@ class Component(component.Main):
 
         # Tangent position ---------------------------------
         # common part
-        d = vector.getDistance(self.guide.apos[0], self.guide.apos[-1])
+        d = vector.getDistance(self.guide.apos[1], self.guide.apos[-2])
         dist_node = node.createDistNode(self.ik0_ctl, self.ik1_ctl)
         rootWorld_node = node.createDecomposeMatrixNode(
             self.root.attr("worldMatrix"))
@@ -556,15 +536,24 @@ class Component(component.Main):
         crv_node = node.createCurveInfoNode(self.slv_crv)
 
         # Division -----------------------------------------
+        tangents = [None, "tan0", "tan1"]
         for i in range(self.settings["division"]):
 
             # References
             u = i / (self.settings["division"] - 1.0)
-            if i == 0:  # we add extra 10% to the first vertebra
-                u = (1.0 / (self.settings["division"] - 1.0)) / 10
+            # if i == 0:  # we add extra 10% to the first vertebra
+            #     u = (1.0 / (self.settings["division"] - 1.0)) / 10
+            if i in [1, 2]:
+                u_param = curve.getCurveParamAtPosition(
+                    self.slv_crv,
+                    self.guide.pos[tangents[i]])[0]
+                cnsType = True
+            else:
+                u_param = u
+                cnsType = False
 
             cns = applyop.pathCns(
-                self.div_cns[i], self.slv_crv, False, u, True)
+                self.div_cns[i], self.slv_crv, cnsType, u_param, True)
 
             cns.setAttr("frontAxis", 1)  # front axis is 'Y'
             cns.setAttr("upAxis", 0)  # front axis is 'X'
@@ -660,8 +649,8 @@ class Component(component.Main):
                                self.div_cns[i] + ".rotate")
 
         # Connections (Hooks) ------------------------------
-        pm.parentConstraint(self.hip_lvl, self.cnx0)
-        pm.scaleConstraint(self.hip_lvl, self.cnx0)
+        # pm.parentConstraint(self.hip_lvl, self.cnx0)
+        # pm.scaleConstraint(self.hip_lvl, self.cnx0)
         pm.parentConstraint(self.scl_transforms[-1], self.cnx1)
         pm.scaleConstraint(self.scl_transforms[-1], self.cnx1)
 
@@ -671,14 +660,15 @@ class Component(component.Main):
     def setRelation(self):
         """Set the relation beetween object from guide to rig"""
         self.relatives["root"] = self.cnx0
-        self.relatives["eff"] = self.cnx1
+        self.relatives["spineTop"] = self.cnx1
         self.relatives["tan0"] = self.fk_ctl[1]
         self.controlRelatives["root"] = self.fk_ctl[0]
-        self.controlRelatives["eff"] = self.fk_ctl[-2]
+        self.controlRelatives["spineTop"] = self.fk_ctl[-2]
 
         self.jointRelatives["root"] = 0
         self.jointRelatives["tan0"] = 1
-        self.jointRelatives["eff"] = -1
+        self.jointRelatives["spineTop"] = -2
+        self.jointRelatives["chest"] = -1
 
-        self.aliasRelatives["root"] = "base"
-        self.aliasRelatives["eff"] = "tip"
+        self.aliasRelatives["root"] = "hip"
+        self.aliasRelatives["chest"] = "chest"

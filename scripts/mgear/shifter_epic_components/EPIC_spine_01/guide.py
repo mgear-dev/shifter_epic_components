@@ -17,7 +17,7 @@ VERSION = [1, 0, 0]
 TYPE = "EPIC_spine_01"
 NAME = "spine"
 DESCRIPTION = "Game ready component for EPIC's UE and other Game Engines\n"\
-    "Based on spine_S_shape_01"
+    "This component match metaHuman spine structure"
 
 ##########################################################
 # CLASS
@@ -38,41 +38,55 @@ class Guide(guide.ComponentGuide):
 
     def postInit(self):
         """Initialize the position for the guide"""
-        self.save_transform = ["root", "tan0", "tan1", "eff"]
+        self.save_transform = ["root",
+                               "spineBase",
+                               "tan0",
+                               "tan1",
+                               "spineTop",
+                               "chest"]
         self.save_blade = ["blade"]
 
     def addObjects(self):
         """Add the Guide Root, blade and locators"""
 
         self.root = self.addRoot()
-        vTemp = transform.getOffsetPosition(self.root, [0, 4, 0])
-        self.eff = self.addLoc("eff", self.root, vTemp)
+        vTemp = transform.getOffsetPosition(self.root, [0, 0, .5])
+        self.spineBase = self.addLoc("spineBase", self.root, vTemp)
+        vTemp = transform.getOffsetPosition(self.root, [0, 0, 4])
+        self.spineTop = self.addLoc("spineTop", self.spineBase, vTemp)
+        vTemp = transform.getOffsetPosition(self.root, [0, 0, 5])
+        self.chest = self.addLoc("chest", self.spineTop, vTemp)
 
         vTan0 = vector.linearlyInterpolate(
             self.root.getTranslation(space="world"),
-            self.eff.getTranslation(space="world"),
+            self.spineTop.getTranslation(space="world"),
             0.3333
         )
-        self.tan0 = self.addLoc("tan0", self.root, vTan0)
+        self.tan0 = self.addLoc("tan0", self.spineBase, vTan0)
 
         vTan1 = vector.linearlyInterpolate(
-            self.eff.getTranslation(space="world"),
+            self.spineTop.getTranslation(space="world"),
             self.root.getTranslation(space="world"),
             0.3333
         )
-        self.tan1 = self.addLoc("tan1", self.root, vTan1)
+        self.tan1 = self.addLoc("tan1", self.spineTop, vTan1)
 
-        self.blade = self.addBlade("blade", self.root, self.eff)
+        self.blade = self.addBlade("blade", self.root, self.spineTop)
 
         # spine curve
-        centers = [self.root, self.tan0, self.tan1, self.eff]
+        self.disp_crv_hip = self.addDispCurve(
+            "crvHip", [self.root, self.spineBase])
+        self.disp_crv_chst = self.addDispCurve(
+            "crvChest", [self.spineTop, self.chest])
+        centers = [self.spineBase, self.tan0, self.tan1, self.spineTop]
         self.dispcrv = self.addDispCurve("crv", centers, 3)
+        self.dispcrv.attr("lineWidth").set(5)
 
         # tangent handles
         self.disp_tancrv0 = self.addDispCurve(
-            "crvTan0", [self.root, self.tan0])
+            "crvTan0", [self.spineBase, self.tan0])
         self.disp_tancrv1 = self.addDispCurve(
-            "crvTan1", [self.eff, self.tan1])
+            "crvTan1", [self.spineTop, self.tan1])
 
     def addParameters(self):
         """Add the configurations settings"""
