@@ -542,7 +542,8 @@ class Component(component.Main):
             # References
             u = i / (self.settings["division"] - 1.0)
             # if i == 0:  # we add extra 10% to the first vertebra
-            #     u = (1.0 / (self.settings["division"] - 1.0)) / 10
+            #     # u = (1.0 / (self.settings["division"] - 1.0)) / 10
+            #     u = 0.001
             if i in [1, 2]:
                 u_param = curve.getCurveParamAtPosition(
                     self.slv_crv,
@@ -621,32 +622,32 @@ class Component(component.Main):
             pm.connectAttr(dm_node + ".outputRotate", self.fk_npo[i].attr("r"))
 
             # Orientation Lock
-            if i == 0:
-                dm_node = node.createDecomposeMatrixNode(
-                    self.ik0_ctl + ".worldMatrix")
+            # if i == 0:
+            #     dm_node = node.createDecomposeMatrixNode(
+            #         self.ik0_ctl + ".worldMatrix")
 
-                blend_node = node.createBlendNode(
-                    [dm_node + ".outputRotate%s" % s for s in "XYZ"],
-                    [cns + ".rotate%s" % s for s in "XYZ"],
-                    self.lock_ori0_att)
+            #     blend_node = node.createBlendNode(
+            #         [dm_node + ".outputRotate%s" % s for s in "XYZ"],
+            #         [cns + ".rotate%s" % s for s in "XYZ"],
+            #         self.lock_ori0_att)
 
-                self.div_cns[i].attr("rotate").disconnect()
+            #     self.div_cns[i].attr("rotate").disconnect()
 
-                pm.connectAttr(blend_node + ".output",
-                               self.div_cns[i] + ".rotate")
+            #     pm.connectAttr(blend_node + ".output",
+            #                    self.div_cns[i] + ".rotate")
 
-            elif i == self.settings["division"] - 1:
-                dm_node = node.createDecomposeMatrixNode(
-                    self.ik1_ctl + ".worldMatrix")
+            # elif i == self.settings["division"] - 1:
+            #     dm_node = node.createDecomposeMatrixNode(
+            #         self.ik1_ctl + ".worldMatrix")
 
-                blend_node = node.createBlendNode(
-                    [dm_node + ".outputRotate%s" % s for s in "XYZ"],
-                    [cns + ".rotate%s" % s for s in "XYZ"],
-                    self.lock_ori1_att)
+            #     blend_node = node.createBlendNode(
+            #         [dm_node + ".outputRotate%s" % s for s in "XYZ"],
+            #         [cns + ".rotate%s" % s for s in "XYZ"],
+            #         self.lock_ori1_att)
 
-                self.div_cns[i].attr("rotate").disconnect()
-                pm.connectAttr(blend_node + ".output",
-                               self.div_cns[i] + ".rotate")
+            #     self.div_cns[i].attr("rotate").disconnect()
+            #     pm.connectAttr(blend_node + ".output",
+            #                    self.div_cns[i] + ".rotate")
 
         # Connections (Hooks) ------------------------------
         # pm.parentConstraint(self.hip_lvl, self.cnx0)
