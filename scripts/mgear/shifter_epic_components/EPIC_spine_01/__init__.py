@@ -72,12 +72,28 @@ class Component(component.Main):
         attribute.setRotOrder(self.ik0_ctl, "ZXY")
         attribute.setInvertMirror(self.ik0_ctl, ["tx", "ry", "rz"])
 
-        # hip base joint
-        # TODO: add option in setting for on/off
-        # if True:
-        #     self.hip_lvl = primitive.addTransform(
-        #         self.ik0_ctl, self.getName("hip_lvl"), t)
-        #     self.jnt_pos.append([self.hip_lvl, "pelvis"])
+        # pelvis
+        self.length0 = vector.getDistance(self.guide.apos[0],
+                                          self.guide.apos[1])
+        vec_po = datatypes.Vector(0, .5 * self.length0 * -1, 0)
+        self.pelvis_npo = primitive.addTransform(
+            self.ik0_ctl, self.getName("pelvis_npo"), t)
+
+        self.pelvis_ctl = self.addCtl(
+            self.pelvis_npo,
+            "pelvis_ctl",
+            t,
+            self.color_ik,
+            "cube",
+            h=self.length0,
+            w=self.size * .1,
+            d=self.size * .1,
+            po=vec_po,
+            tp=self.parentCtlTag)
+        self.pelvis_lvl = primitive.addTransform(
+            self.pelvis_ctl, self.getName("pelvis_lvl"),
+            transform.setMatrixPosition(t, self.guide.apos[0]))
+        self.jnt_pos.append([self.pelvis_lvl, "pelvis"])
 
         t = transform.setMatrixPosition(t, self.guide.apos[-2])
         if self.settings["autoBend"]:
@@ -290,10 +306,6 @@ class Component(component.Main):
             self.div_cns.append(div_cns)
             parentdiv = div_cns
 
-            # Controlers (First and last one are fake)
-            # if i in [0]:
-            # TODO: add option setting to add or not the first and
-            #  last controller for the fk
             if i in [0, self.settings["division"] - 1] and False:
                 # if i in [0, self.settings["division"] - 1]:
                 fk_ctl = primitive.addTransform(
@@ -340,7 +352,6 @@ class Component(component.Main):
             self.scl_transforms.append(scl_ref)
 
             # Deformers (Shadow)
-            # self.jnt_pos.append([scl_ref, i])
             self.jnt_pos.append([scl_ref, "spine_" + str(i + 1).zfill(2)])
 
             # Twist references (This objects will replace the spinlookup
@@ -363,13 +374,13 @@ class Component(component.Main):
             self.twister.append(twister)
             self.ref_twist.append(ref_twist)
 
-            # TODO: update this part with the optiona FK controls update
             for x in self.fk_ctl[:-1]:
                 attribute.setInvertMirror(x, ["tx", "rz", "ry"])
 
         # Connections (Hooks) ------------------------------
         self.cnx0 = primitive.addTransform(self.root, self.getName("0_cnx"))
         self.cnx1 = primitive.addTransform(self.root, self.getName("1_cnx"))
+        self.jnt_pos.append([self.cnx1, "spine_" + str(i + 2).zfill(2)])
 
     def addAttributes(self):
 
@@ -541,10 +552,15 @@ class Component(component.Main):
 
             # References
             u = i / (self.settings["division"] - 1.0)
-            # if i == 0:  # we add extra 10% to the first vertebra
-            #     # u = (1.0 / (self.settings["division"] - 1.0)) / 10
-            #     u = 0.001
-            if i in [1, 2]:
+
+            # check the indx to calculate mid point based on number of division
+            # we want to use the same spine for mannequin and metahuman spine
+            if self.settings["division"] == 4 and i in [1, 2]:
+                u_param = curve.getCurveParamAtPosition(
+                    self.slv_crv,
+                    self.guide.pos[tangents[i]])[0]
+                cnsType = True
+            elif self.settings["division"] == 3 and i in [1]:
                 u_param = curve.getCurveParamAtPosition(
                     self.slv_crv,
                     self.guide.pos[tangents[i]])[0]
@@ -621,38 +637,15 @@ class Component(component.Main):
 
             pm.connectAttr(dm_node + ".outputRotate", self.fk_npo[i].attr("r"))
 
-            # Orientation Lock
-            # if i == 0:
-            #     dm_node = node.createDecomposeMatrixNode(
-            #         self.ik0_ctl + ".worldMatrix")
-
-            #     blend_node = node.createBlendNode(
-            #         [dm_node + ".outputRotate%s" % s for s in "XYZ"],
-            #         [cns + ".rotate%s" % s for s in "XYZ"],
-            #         self.lock_ori0_att)
-
-            #     self.div_cns[i].attr("rotate").disconnect()
-
-            #     pm.connectAttr(blend_node + ".output",
-            #                    self.div_cns[i] + ".rotate")
-
-            # elif i == self.settings["division"] - 1:
-            #     dm_node = node.createDecomposeMatrixNode(
-            #         self.ik1_ctl + ".worldMatrix")
-
-            #     blend_node = node.createBlendNode(
-            #         [dm_node + ".outputRotate%s" % s for s in "XYZ"],
-            #         [cns + ".rotate%s" % s for s in "XYZ"],
-            #         self.lock_ori1_att)
-
-            #     self.div_cns[i].attr("rotate").disconnect()
-            #     pm.connectAttr(blend_node + ".output",
-            #                    self.div_cns[i] + ".rotate")
-
         # Connections (Hooks) ------------------------------
-        # pm.parentConstraint(self.hip_lvl, self.cnx0)
-        # pm.scaleConstraint(self.hip_lvl, self.cnx0)
-        pm.parentConstraint(self.scl_transforms[-1], self.cnx1)
+        pm.parentConstraint(self.pelvis_lvl, self.cnx0)
+        pm.scaleConstraint(self.pelvis_lvl, self.cnx0)
+
+        transform.matchWorldTransform(self.scl_transforms[-1], self.cnx1)
+        t = transform.setMatrixPosition(transform.getTransform(self.cnx1),
+                                        self.guide.apos[-1])
+        self.cnx1.setMatrix(t, worldSpace=True)
+        pm.parentConstraint(self.scl_transforms[-1], self.cnx1, mo=True)
         pm.scaleConstraint(self.scl_transforms[-1], self.cnx1)
 
     # =====================================================
@@ -671,5 +664,5 @@ class Component(component.Main):
         self.jointRelatives["spineTop"] = -2
         self.jointRelatives["chest"] = -1
 
-        self.aliasRelatives["root"] = "hip"
+        self.aliasRelatives["root"] = "pelvis"
         self.aliasRelatives["chest"] = "chest"

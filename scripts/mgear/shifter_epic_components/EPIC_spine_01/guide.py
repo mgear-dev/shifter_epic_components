@@ -58,7 +58,7 @@ class Guide(guide.ComponentGuide):
         self.chest = self.addLoc("chest", self.spineTop, vTemp)
 
         vTan0 = vector.linearlyInterpolate(
-            self.root.getTranslation(space="world"),
+            self.spineBase.getTranslation(space="world"),
             self.spineTop.getTranslation(space="world"),
             0.3333
         )
@@ -66,7 +66,7 @@ class Guide(guide.ComponentGuide):
 
         vTan1 = vector.linearlyInterpolate(
             self.spineTop.getTranslation(space="world"),
-            self.root.getTranslation(space="world"),
+            self.spineBase.getTranslation(space="world"),
             0.3333
         )
         self.tan1 = self.addLoc("tan1", self.spineTop, vTan1)
@@ -99,10 +99,10 @@ class Guide(guide.ComponentGuide):
         self.pLockOri = self.addParam("lock_ori", "double", 1, 0, 1)
 
         # Options
-        self.pDivision = self.addParam("division", "long", 5, 3)
-        self.pAutoBend = self.addParam("autoBend", "bool", False)
-        self.pCentralTangent = self.addParam("centralTangent", "bool", False)
-        self.pIKWorldOri = self.addParam("IKWorldOri", "bool", False)
+        self.pDivision = self.addParam("division", "long", 4, 2)
+        self.pAutoBend = self.addParam("autoBend", "bool", True)
+        self.pCentralTangent = self.addParam("centralTangent", "bool", True)
+        self.pIKWorldOri = self.addParam("IKWorldOri", "bool", True)
 
         # FCurves
         self.pSt_profile = self.addFCurveParam(
