@@ -123,13 +123,18 @@ class Component(component.Main):
 
         t = transform.getTransformLookingAt(self.guide.apos[2],
                                             self.guide.apos[3],
-                                            self.normal,
-                                            "xz",
+                                            self.blade_normal,
+                                            "x-z",
                                             self.negate)
 
         if self.settings["FK_rest_T_Pose"]:
             t_npo = transform.setMatrixPosition(
-                transform.getTransform(self.fk0_ctl), self.guide.apos[2])
+                transform.getTransform(self.fk1_ctl), self.guide.apos[2])
+            # t_npo = transform.getTransformLookingAt(self.guide.apos[2],
+            #                                         self.guide.apos[3],
+            #                                         self.normal,
+            #                                         "xz",
+            #                                         self.negate)
         else:
             t_npo = t
 
@@ -235,16 +240,26 @@ class Component(component.Main):
         attribute.setInvertMirror(self.ikcns_ctl, ["tx", "ty", "tz"])
 
         if self.negate:
+            # m = transform.getTransformLookingAt(self.guide.pos["wrist"],
+            #                                     self.guide.pos["eff"],
+            #                                     self.normal,
+            #                                     "x-y",
+            #                                     True)
             m = transform.getTransformLookingAt(self.guide.pos["wrist"],
                                                 self.guide.pos["eff"],
-                                                self.normal,
-                                                "x-y",
+                                                self.blade_normal,
+                                                "xz",
                                                 True)
         else:
+            # m = transform.getTransformLookingAt(self.guide.pos["wrist"],
+            #                                     self.guide.pos["eff"],
+            #                                     self.normal,
+            #                                     "xy",
+            #                                     False)
             m = transform.getTransformLookingAt(self.guide.pos["wrist"],
                                                 self.guide.pos["eff"],
-                                                self.normal,
-                                                "xy",
+                                                self.blade_normal,
+                                                "x-z",
                                                 False)
 
         self.ik_ctl = self.addCtl(self.ikcns_ctl,
@@ -260,6 +275,7 @@ class Component(component.Main):
         if self.settings["mirrorIK"]:
             if self.negate:
                 self.ik_cns.sx.set(-1)
+                self.ik_ctl.ry.set(self.ik_ctl.ry.get() * -1)
                 self.ik_ctl.rz.set(self.ik_ctl.rz.get() * -1)
         else:
             attribute.setInvertMirror(self.ik_ctl, ["tx", "ry", "rz"])
@@ -290,8 +306,8 @@ class Component(component.Main):
         # Calculate  again the transfor for the IK ref. This way align with FK
         trnIK_ref = transform.getTransformLookingAt(self.guide.pos["wrist"],
                                                     self.guide.pos["eff"],
-                                                    self.normal,
-                                                    "xz",
+                                                    self.blade_normal,
+                                                    "x-z",
                                                     self.negate)
         self.ik_ref = primitive.addTransform(self.ik_ctl_ref,
                                              self.getName("ik_ref"),
@@ -703,9 +719,10 @@ class Component(component.Main):
             "ikSCsolver")
         pm.pointConstraint(self.ik_ctl,
                            self.ikHandleUpvRef)
-        pm.parentConstraint(self.armChainUpvRef[0],
-                            self.upv_cns,
-                            mo=True)
+        p_cns = pm.parentConstraint(self.armChainUpvRef[0],
+                                    self.upv_cns,
+                                    mo=True)
+        p_cns.interpType.set(0)
 
         # Visibilities -------------------------------------
         # fk
