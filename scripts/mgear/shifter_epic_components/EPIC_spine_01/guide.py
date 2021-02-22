@@ -96,7 +96,9 @@ class Guide(guide.ComponentGuide):
         self.pMaxStretch = self.addParam("maxstretch", "double", 1.5, 1)
         self.pMaxSquash = self.addParam("maxsquash", "double", .5, 0, 1)
         self.pSoftness = self.addParam("softness", "double", 0, 0, 1)
-        self.pLockOri = self.addParam("lock_ori", "double", 1, 0, 1)
+        self.pLockOriPelvis = self.addParam(
+            "lock_ori_pelvis", "double", 1, 0, 1)
+        self.pLockOriChest = self.addParam("lock_ori_chest", "double", 1, 0, 1)
 
         # Options
         self.pDivision = self.addParam("division", "long", 4, 2)
@@ -181,10 +183,14 @@ class componentSettings(MayaQWidgetDockableMixin, guide.componentMainSettings):
             int(self.root.attr("position").get() * 100))
         self.settingsTab.position_slider.setValue(
             int(self.root.attr("position").get() * 100))
-        self.settingsTab.lockOri_spinBox.setValue(
-            int(self.root.attr("lock_ori").get() * 100))
-        self.settingsTab.lockOri_slider.setValue(
-            int(self.root.attr("lock_ori").get() * 100))
+        self.settingsTab.lockOri_pelvis_spinBox.setValue(
+            int(self.root.attr("lock_ori_pelvis").get() * 100))
+        self.settingsTab.lockOri_pelvis_slider.setValue(
+            int(self.root.attr("lock_ori_pelvis").get() * 100))
+        self.settingsTab.lockOri_chest_spinBox.setValue(
+            int(self.root.attr("lock_ori_chest").get() * 100))
+        self.settingsTab.lockOri_chest_slider.setValue(
+            int(self.root.attr("lock_ori_chest").get() * 100))
         self.settingsTab.softness_spinBox.setValue(
             int(self.root.attr("softness").get() * 100))
         self.settingsTab.maxStretch_spinBox.setValue(
@@ -224,14 +230,22 @@ class componentSettings(MayaQWidgetDockableMixin, guide.componentMainSettings):
             partial(self.updateSlider,
                     self.settingsTab.position_spinBox,
                     "position"))
-        self.settingsTab.lockOri_slider.valueChanged.connect(
+        self.settingsTab.lockOri_pelvis_slider.valueChanged.connect(
             partial(self.updateSlider,
-                    self.settingsTab.lockOri_slider,
-                    "lock_ori"))
-        self.settingsTab.lockOri_spinBox.valueChanged.connect(
+                    self.settingsTab.lockOri_pelvis_slider,
+                    "lock_ori_pelvis"))
+        self.settingsTab.lockOri_pelvis_spinBox.valueChanged.connect(
             partial(self.updateSlider,
-                    self.settingsTab.lockOri_spinBox,
-                    "lock_ori"))
+                    self.settingsTab.lockOri_pelvis_spinBox,
+                    "lock_ori_pelvis"))
+        self.settingsTab.lockOri_chest_slider.valueChanged.connect(
+            partial(self.updateSlider,
+                    self.settingsTab.lockOri_chest_slider,
+                    "lock_ori_chest"))
+        self.settingsTab.lockOri_chest_spinBox.valueChanged.connect(
+            partial(self.updateSlider,
+                    self.settingsTab.lockOri_chest_spinBox,
+                    "lock_ori_chest"))
         self.settingsTab.maxStretch_spinBox.valueChanged.connect(
             partial(self.updateSpinBox,
                     self.settingsTab.maxStretch_spinBox,

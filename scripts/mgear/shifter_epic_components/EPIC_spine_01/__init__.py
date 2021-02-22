@@ -404,17 +404,19 @@ class Component(component.Main):
         self.softness_att = self.addAnimParam(
             "softness", "Softness", "double", self.settings["softness"], 0, 1)
 
-        self.lock_ori0_att = self.addAnimParam("lock_ori0",
-                                               "Lock Ori 0",
-                                               "double",
-                                               self.settings["lock_ori"],
-                                               0,
-                                               1)
+        self.lock_ori0_att = self.addAnimParam(
+            "lock_ori_pelvis",
+            "Lock Ori Pelvis",
+            "double",
+            self.settings[
+                "lock_ori_pelvis"],
+            0,
+            1)
 
-        self.lock_ori1_att = self.addAnimParam("lock_ori1",
-                                               "Lock Ori 1",
+        self.lock_ori1_att = self.addAnimParam("lock_ori_chest",
+                                               "Lock Ori Chest",
                                                "double",
-                                               self.settings["lock_ori"],
+                                               self.settings["lock_ori_chest"],
                                                0,
                                                1)
 
@@ -637,6 +639,34 @@ class Component(component.Main):
 
             pm.connectAttr(dm_node + ".outputRotate", self.fk_npo[i].attr("r"))
 
+        # Orientation Lock
+            if i == 0:
+                dm_node = node.createDecomposeMatrixNode(
+                    self.ik0_ctl + ".worldMatrix")
+
+                blend_node = node.createBlendNode(
+                    [dm_node + ".outputRotate%s" % s for s in "XYZ"],
+                    [cns + ".rotate%s" % s for s in "XYZ"],
+                    self.lock_ori0_att)
+
+                self.div_cns[i].attr("rotate").disconnect()
+
+                pm.connectAttr(blend_node + ".output",
+                               self.div_cns[i] + ".rotate")
+
+            elif i == self.settings["division"] - 1:
+                dm_node = node.createDecomposeMatrixNode(
+                    self.ik1_ctl + ".worldMatrix")
+
+                blend_node = node.createBlendNode(
+                    [dm_node + ".outputRotate%s" % s for s in "XYZ"],
+                    [cns + ".rotate%s" % s for s in "XYZ"],
+                    self.lock_ori1_att)
+
+                self.div_cns[i].attr("rotate").disconnect()
+                pm.connectAttr(blend_node + ".output",
+                               self.div_cns[i] + ".rotate")
+
         # Connections (Hooks) ------------------------------
         pm.parentConstraint(self.pelvis_lvl, self.cnx0)
         pm.scaleConstraint(self.pelvis_lvl, self.cnx0)
@@ -655,9 +685,11 @@ class Component(component.Main):
         """Set the relation beetween object from guide to rig"""
         self.relatives["root"] = self.cnx0
         self.relatives["spineTop"] = self.cnx1
+        self.relatives["chest"] = self.cnx1
         self.relatives["tan0"] = self.fk_ctl[1]
         self.controlRelatives["root"] = self.fk_ctl[0]
         self.controlRelatives["spineTop"] = self.fk_ctl[-2]
+        self.controlRelatives["chest"] = self.fk_ctl[-2]
 
         self.jointRelatives["root"] = 0
         self.jointRelatives["tan0"] = 1
