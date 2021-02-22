@@ -130,11 +130,7 @@ class Component(component.Main):
         if self.settings["FK_rest_T_Pose"]:
             t_npo = transform.setMatrixPosition(
                 transform.getTransform(self.fk1_ctl), self.guide.apos[2])
-            # t_npo = transform.getTransformLookingAt(self.guide.apos[2],
-            #                                         self.guide.apos[3],
-            #                                         self.normal,
-            #                                         "xz",
-            #                                         self.negate)
+
         else:
             t_npo = t
 
@@ -240,22 +236,14 @@ class Component(component.Main):
         attribute.setInvertMirror(self.ikcns_ctl, ["tx", "ty", "tz"])
 
         if self.negate:
-            # m = transform.getTransformLookingAt(self.guide.pos["wrist"],
-            #                                     self.guide.pos["eff"],
-            #                                     self.normal,
-            #                                     "x-y",
-            #                                     True)
+
             m = transform.getTransformLookingAt(self.guide.pos["wrist"],
                                                 self.guide.pos["eff"],
                                                 self.blade_normal,
                                                 "xz",
                                                 True)
         else:
-            # m = transform.getTransformLookingAt(self.guide.pos["wrist"],
-            #                                     self.guide.pos["eff"],
-            #                                     self.normal,
-            #                                     "xy",
-            #                                     False)
+
             m = transform.getTransformLookingAt(self.guide.pos["wrist"],
                                                 self.guide.pos["eff"],
                                                 self.blade_normal,
@@ -489,7 +477,6 @@ class Component(component.Main):
                 twist_idx += increment
 
         self.jnt_pos.append([self.eff_jnt_off, 'hand', current_parent])
-        # self.jnt_pos.append([self.eff_loc, 'hand', "1"])
 
         # match IK FK references
         self.match_fk0_off = self.add_match_ref(self.fk_ctl[1],
