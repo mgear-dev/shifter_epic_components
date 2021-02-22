@@ -86,7 +86,7 @@ class Guide(guide.ComponentGuide):
         self.pSoftness = self.addParam("softness", "double", 0, 0, 1)
 
         # Options
-        self.pDivision = self.addParam("division", "long", 2, 2)
+        self.pDivision = self.addParam("division", "long", 2, 1)
         self.pTangentControls = self.addParam("tangentControls", "bool", False)
         self.pChickenStyleIk = self.addParam("chickenStyleIK", "bool", True)
         self.pIKWorldOri = self.addParam("IKWorldOri", "bool", False)
