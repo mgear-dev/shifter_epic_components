@@ -135,9 +135,17 @@ class Component(component.Main):
                                             self.normal,
                                             "xz",
                                             self.negate)
+        if self.settings["FK_rest_T_Pose"]:
+            t_npo = transform.setMatrixPosition(
+                transform.getTransform(self.fk0_ctl), self.guide.apos[2])
+        else:
+            t_npo = t
 
         self.fk2_npo = primitive.addTransform(
-            self.fk1_ctl, self.getName("fk2_npo"), t)
+            self.fk1_ctl, self.getName("fk2_npo"), t_npo)
+
+        if self.settings["FK_rest_T_Pose"]:
+            self.fk2_npo.rz.set(90)
 
         po_vec = datatypes.Vector(.5 * self.length2 * self.n_factor, 0, 0)
         self.fk2_ctl = self.addCtl(self.fk2_npo,
@@ -178,14 +186,14 @@ class Component(component.Main):
         #                                     self.x_axis,
         #                                     "zx",
         #                                     False)
-        if self.settings["FK_rest_T_Pose"]:
-            t_ik = transform.getTransformLookingAt(self.guide.pos["ankle"],
-                                                   self.guide.pos["eff"],
-                                                   self.normal * -1,
-                                                   "zx",
-                                                   False)
-        else:
-            t_ik = transform.getTransformFromPos(self.guide.pos["ankle"])
+        # if self.settings["FK_rest_T_Pose"]:
+        #     t_ik = transform.getTransformLookingAt(self.guide.pos["ankle"],
+        #                                            self.guide.pos["eff"],
+        #                                            self.normal * -1,
+        #                                            "zx",
+        #                                            False)
+        # else:
+        t_ik = transform.getTransformFromPos(self.guide.pos["ankle"])
 
         self.ik_ctl = self.addCtl(
             self.ikcns_ctl,
@@ -417,8 +425,8 @@ class Component(component.Main):
         # set the offset rotation for the hand
         self.end_jnt_off = primitive.addTransform(self.end_ref,
                                                   self.getName("end_off"), m)
-        if self.up_axis == "z":
-            self.end_jnt_off.rz.set(-90)
+        # if self.up_axis == "z":
+        #     self.end_jnt_off.rz.set(-90)
         self.jnt_pos.append([self.end_jnt_off, 'foot', current_parent])
 
         # match IK FK references
@@ -685,7 +693,7 @@ class Component(component.Main):
                     (i - self.settings["div0"] - 1.0) * .5 / \
                     (self.settings["div1"] + 1.0)
 
-            perc = max(.001, min(.990, perc))
+            perc = max(.0001, min(.999, perc))
 
             # Roll
             if self.negate:
