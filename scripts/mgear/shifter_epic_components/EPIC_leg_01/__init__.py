@@ -425,8 +425,8 @@ class Component(component.Main):
         # set the offset rotation for the hand
         self.end_jnt_off = primitive.addTransform(self.end_ref,
                                                   self.getName("end_off"), m)
-        # if self.up_axis == "z":
-        #     self.end_jnt_off.rz.set(-90)
+        if self.up_axis == "z":
+            self.end_jnt_off.rz.set(-90)
         self.jnt_pos.append([self.end_jnt_off, 'foot', current_parent])
 
         # match IK FK references
