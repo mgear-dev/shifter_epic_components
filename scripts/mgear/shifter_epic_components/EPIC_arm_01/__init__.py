@@ -714,13 +714,15 @@ class Component(component.Main):
         # Visibilities -------------------------------------
         # fk
         fkvis_node = node.createReverseNode(self.blend_att)
-
-        for shp in self.fk0_ctl.getShapes():
-            pm.connectAttr(fkvis_node + ".outputX", shp.attr("visibility"))
-        for shp in self.fk1_ctl.getShapes():
-            pm.connectAttr(fkvis_node + ".outputX", shp.attr("visibility"))
-        for shp in self.fk2_ctl.getShapes():
-            pm.connectAttr(fkvis_node + ".outputX", shp.attr("visibility"))
+        try:
+            for shp in self.fk0_ctl.getShapes():
+                pm.connectAttr(fkvis_node.outputX, shp.attr("visibility"))
+            for shp in self.fk1_ctl.getShapes():
+                pm.connectAttr(fkvis_node.outputX, shp.attr("visibility"))
+            for shp in self.fk2_ctl.getShapes():
+                pm.connectAttr(fkvis_node.outputX, shp.attr("visibility"))
+        except RuntimeError:
+            pm.displayInfo("Visibility already connected")
 
         # ik
         for shp in self.upv_ctl.getShapes():

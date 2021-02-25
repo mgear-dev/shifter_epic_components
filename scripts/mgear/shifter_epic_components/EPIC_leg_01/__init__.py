@@ -590,23 +590,25 @@ class Component(component.Main):
         # shape.dispGeometry
         # fk
         fkvis_node = node.createReverseNode(self.blend_att)
+        try:
+            for shp in self.fk0_ctl.getShapes():
+                pm.connectAttr(fkvis_node.outputX, shp.attr("visibility"))
+            for shp in self.fk1_ctl.getShapes():
+                pm.connectAttr(fkvis_node.outputX, shp.attr("visibility"))
+            for shp in self.fk2_ctl.getShapes():
+                pm.connectAttr(fkvis_node.outputX, shp.attr("visibility"))
 
-        for shp in self.fk0_ctl.getShapes():
-            pm.connectAttr(fkvis_node + ".outputX", shp.attr("visibility"))
-        for shp in self.fk1_ctl.getShapes():
-            pm.connectAttr(fkvis_node + ".outputX", shp.attr("visibility"))
-        for shp in self.fk2_ctl.getShapes():
-            pm.connectAttr(fkvis_node + ".outputX", shp.attr("visibility"))
-
-        # ik
-        for shp in self.upv_ctl.getShapes():
-            pm.connectAttr(self.blend_att, shp.attr("visibility"))
-        for shp in self.ikcns_ctl.getShapes():
-            pm.connectAttr(self.blend_att, shp.attr("visibility"))
-        for shp in self.ik_ctl.getShapes():
-            pm.connectAttr(self.blend_att, shp.attr("visibility"))
-        for shp in self.line_ref.getShapes():
-            pm.connectAttr(self.blend_att, shp.attr("visibility"))
+            # ik
+            for shp in self.upv_ctl.getShapes():
+                pm.connectAttr(self.blend_att, shp.attr("visibility"))
+            for shp in self.ikcns_ctl.getShapes():
+                pm.connectAttr(self.blend_att, shp.attr("visibility"))
+            for shp in self.ik_ctl.getShapes():
+                pm.connectAttr(self.blend_att, shp.attr("visibility"))
+            for shp in self.line_ref.getShapes():
+                pm.connectAttr(self.blend_att, shp.attr("visibility"))
+        except RuntimeError:
+            pm.displayInfo("Visibility already connecte")
 
         # IK Solver -----------------------------------------
         out = [self.bone0, self.bone1, self.ctrn_loc, self.eff_loc]
@@ -660,19 +662,19 @@ class Component(component.Main):
         # Volume -------------------------------------------
         distA_node = node.createDistNode(self.tws0_loc, self.tws1_loc)
         distB_node = node.createDistNode(self.tws1_loc, self.tws2_loc)
-        add_node = node.createAddNode(distA_node + ".distance",
-                                      distB_node + ".distance")
-        div_node = node.createDivNode(add_node + ".output",
+        add_node = node.createAddNode(distA_node.distance,
+                                      distB_node.distance)
+        div_node = node.createDivNode(add_node.output,
                                       self.root_ctl.attr("sx"))
 
         # comp scaling issue
         dm_node = pm.createNode("decomposeMatrix")
-        pm.connectAttr(self.root.attr("worldMatrix"), dm_node + ".inputMatrix")
+        pm.connectAttr(self.root.attr("worldMatrix"), dm_node.inputMatrix)
 
-        div_node2 = node.createDivNode(div_node + ".outputX",
-                                       dm_node + ".outputScaleX")
+        div_node2 = node.createDivNode(div_node.outputX,
+                                       dm_node.outputScaleX)
 
-        self.volDriver_att = div_node2 + ".outputX"
+        self.volDriver_att = div_node2.outputX
 
         if self.settings["extraTweak"]:
             for tweak_ctl in self.tweak_ctl:
@@ -709,16 +711,16 @@ class Component(component.Main):
                     perc,
                     subdiv)
 
-            pm.connectAttr(self.resample_att, o_node + ".resample")
-            pm.connectAttr(self.absolute_att, o_node + ".absolute")
+            pm.connectAttr(self.resample_att, o_node.resample)
+            pm.connectAttr(self.absolute_att, o_node.absolute)
 
             # Squash n Stretch
             o_node = applyop.gear_squashstretch2_op(
                 div_cns, None, pm.getAttr(self.volDriver_att), "x")
-            pm.connectAttr(self.volume_att, o_node + ".blend")
-            pm.connectAttr(self.volDriver_att, o_node + ".driver")
-            pm.connectAttr(self.st_att[i], o_node + ".stretch")
-            pm.connectAttr(self.sq_att[i], o_node + ".squash")
+            pm.connectAttr(self.volume_att, o_node.blend)
+            pm.connectAttr(self.volDriver_att, o_node.driver)
+            pm.connectAttr(self.st_att[i], o_node.stretch)
+            pm.connectAttr(self.sq_att[i], o_node.squash)
 
         # match IK/FK ref
         pm.parentConstraint(self.bone0, self.match_fk0_off, mo=True)

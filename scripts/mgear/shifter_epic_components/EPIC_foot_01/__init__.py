@@ -229,19 +229,21 @@ class Component(component.Main):
 
         """
         # Visibilities -------------------------------------
+        try:
+            # ik
+            if self.settings["useRollCtl"]:
+                for shp in self.roll_ctl.getShapes():
+                    pm.connectAttr(self.blend_att, shp.attr("visibility"))
+            for bk_ctl in self.bk_ctl:
+                for shp in bk_ctl.getShapes():
+                    pm.connectAttr(self.blend_att, shp.attr("visibility"))
 
-        # ik
-        if self.settings["useRollCtl"]:
-            for shp in self.roll_ctl.getShapes():
+            for shp in self.heel_ctl.getShapes():
                 pm.connectAttr(self.blend_att, shp.attr("visibility"))
-        for bk_ctl in self.bk_ctl:
-            for shp in bk_ctl.getShapes():
+            for shp in self.tip_ctl.getShapes():
                 pm.connectAttr(self.blend_att, shp.attr("visibility"))
-
-        for shp in self.heel_ctl.getShapes():
-            pm.connectAttr(self.blend_att, shp.attr("visibility"))
-        for shp in self.tip_ctl.getShapes():
-            pm.connectAttr(self.blend_att, shp.attr("visibility"))
+        except RuntimeError:
+            pm.displayInfo("Visibility already connect")
 
         # Roll / Bank --------------------------------------
         if self.settings["useRollCtl"]:  # Using the controler
@@ -254,39 +256,39 @@ class Component(component.Main):
             [180, 0, 180])
 
         inAdd_nod = node.createAddNode(
-            clamp_node + ".outputB",
+            clamp_node.outputB,
             pm.getAttr(self.in_piv.attr("rx")) * self.n_factor)
 
-        pm.connectAttr(clamp_node + ".outputR", self.heel_loc.attr("rz"))
-        pm.connectAttr(clamp_node + ".outputG", self.out_piv.attr("rx"))
-        pm.connectAttr(inAdd_nod + ".output", self.in_piv.attr("rx"))
+        pm.connectAttr(clamp_node.outputR, self.heel_loc.attr("rz"))
+        pm.connectAttr(clamp_node.outputG, self.out_piv.attr("rx"))
+        pm.connectAttr(inAdd_nod.output, self.in_piv.attr("rx"))
 
         # Reverse Controler offset -------------------------
         angle_outputs = node.createAddNodeMulti(self.angles_att)
         for i, bk_loc in enumerate(reversed(self.bk_loc)):
 
             if i == 0:  # First
-                input = self.roll_att
+                inpu = self.roll_att
                 min_input = self.angles_att[i]
 
             elif i == len(self.angles_att):  # Last
                 sub_nod = node.createSubNode(self.roll_att,
                                              angle_outputs[i - 1])
-                input = sub_nod + ".output"
+                inpu = sub_nod.output
                 min_input = -360
 
             else:  # Others
                 sub_nod = node.createSubNode(self.roll_att,
                                              angle_outputs[i - 1])
-                input = sub_nod + ".output"
+                inpu = sub_nod.output
                 min_input = self.angles_att[i]
 
-            clamp_node = node.createClampNode(input, min_input, 0)
+            clamp_node = node.createClampNode(inpu, min_input, 0)
 
-            add_node = node.createAddNode(clamp_node + ".outputR",
+            add_node = node.createAddNode(clamp_node.outputR,
                                           bk_loc.getAttr("rz"))
 
-            pm.connectAttr(add_node + ".output", bk_loc.attr("rz"))
+            pm.connectAttr(add_node.output, bk_loc.attr("rz"))
 
         # Reverse compensation -----------------------------
         for i, fk_loc in enumerate(self.fk_loc):
@@ -296,7 +298,7 @@ class Component(component.Main):
 
             # Inverse Rotorder
             o_node = applyop.gear_inverseRotorder_op(bk_ctl, fk_ctl)
-            pm.connectAttr(o_node + ".output", bk_loc.attr("ro"))
+            pm.connectAttr(o_node.output, bk_loc.attr("ro"))
             pm.connectAttr(fk_ctl.attr("ro"), fk_loc.attr("ro"))
             attribute.lockAttribute(bk_ctl, "ro")
 
@@ -309,16 +311,16 @@ class Component(component.Main):
             addz_node = node.createAddNode(
                 bk_ctl.attr("rz"), bk_loc.attr("rz"))
             addz_node = node.createAddNode(
-                addz_node + ".output",
+                addz_node.output,
                 -bk_loc.getAttr("rz") - fk_loc.getAttr("rz"))
 
-            neg_node = node.createMulNode([addx_node + ".output",
-                                           addy_node + ".output",
-                                           addz_node + ".output"],
+            neg_node = node.createMulNode([addx_node.output,
+                                           addy_node.output,
+                                           addz_node.output],
                                           [-1, -1, -1])
-            ik_outputs = [neg_node + ".outputX",
-                          neg_node + ".outputY",
-                          neg_node + ".outputZ"]
+            ik_outputs = [neg_node.outputX,
+                          neg_node.outputY,
+                          neg_node.outputZ]
 
             # fk
             fk_outputs = [0, 0, fk_loc.getAttr("rz")]
@@ -327,7 +329,7 @@ class Component(component.Main):
             blend_node = node.createBlendNode(ik_outputs,
                                               fk_outputs,
                                               self.blend_att)
-            pm.connectAttr(blend_node + ".output", fk_loc.attr("rotate"))
+            pm.connectAttr(blend_node.output, fk_loc.attr("rotate"))
 
         return
 
@@ -400,11 +402,11 @@ class Component(component.Main):
                                  self.parent_comp.ik_ref,
                                  self.fk_ref, wal=True)
         bc_node = pm.createNode("blendColors")
-        pm.connectAttr(bc_node + ".outputB",
+        pm.connectAttr(bc_node.outputB,
                        cns + ".%sW0" % self.parent_comp.fk_ref)
-        pm.connectAttr(bc_node + ".outputR",
+        pm.connectAttr(bc_node.outputR,
                        cns + ".%sW1" % self.parent_comp.ik_ref)
-        pm.connectAttr(self.parent_comp.blend_att, bc_node + ".blender")
+        pm.connectAttr(self.parent_comp.blend_att, bc_node.blender)
 
         return
 
