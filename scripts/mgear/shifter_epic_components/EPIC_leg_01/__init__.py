@@ -733,7 +733,7 @@ class Component(component.Main):
     def setRelation(self):
         """Set the relation beetween object from guide to rig"""
         self.relatives["root"] = self.div_cns[0]
-        self.relatives["knee"] = self.div_cns[self.settings["div0"] + 2]
+        self.relatives["knee"] = self.div_cns[self.settings["div0"] + 1]
         self.relatives["ankle"] = self.div_cns[-1]
         self.relatives["eff"] = self.end_ref
 
