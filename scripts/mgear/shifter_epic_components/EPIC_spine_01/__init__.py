@@ -306,48 +306,47 @@ class Component(component.Main):
             self.div_cns.append(div_cns)
             parentdiv = div_cns
 
-            if i in [0, self.settings["division"] - 1] and False:
-                # if i in [0, self.settings["division"] - 1]:
-                fk_ctl = primitive.addTransform(
-                    parentctl,
-                    self.getName("%s_loc" % i),
-                    transform.getTransform(parentctl))
+            t = transform.getTransform(parentctl)
 
-                fk_npo = fk_ctl
-                if i in [self.settings["division"] - 1]:
-                    self.fk_ctl.append(fk_ctl)
-            else:
-                m = transform.getTransform(self.root)
-                t = transform.getTransform(parentctl)
-                m.inverse()
+            fk_npo = primitive.addTransform(
+                parentctl,
+                self.getName("fk%s_npo" % (i)),
+                t)
 
-                fk_npo = primitive.addTransform(
-                    parentctl,
-                    self.getName("fk%s_npo" % (i)),
-                    t)
+            fk_ctl = self.addCtl(
+                fk_npo,
+                "fk%s_ctl" % (i),
+                transform.getTransform(parentctl),
+                self.color_fk,
+                "cube",
+                w=self.size,
+                h=self.size * .05,
+                d=self.size,
+                tp=self.preiviousCtlTag)
 
-                fk_ctl = self.addCtl(
-                    fk_npo,
-                    "fk%s_ctl" % (i),
-                    transform.getTransform(parentctl),
-                    self.color_fk,
-                    "cube",
-                    w=self.size,
-                    h=self.size * .05,
-                    d=self.size,
-                    tp=self.preiviousCtlTag)
-
-                attribute.setKeyableAttributes(self.fk_ctl)
-                attribute.setRotOrder(fk_ctl, "ZXY")
-                self.fk_ctl.append(fk_ctl)
-                self.preiviousCtlTag = fk_ctl
+            attribute.setKeyableAttributes(self.fk_ctl)
+            attribute.setRotOrder(fk_ctl, "ZXY")
+            self.fk_ctl.append(fk_ctl)
+            self.preiviousCtlTag = fk_ctl
 
             self.fk_npo.append(fk_npo)
             parentctl = fk_ctl
+            if i == self.settings["division"] - 1:
+                t = transform.getTransformLookingAt(
+                    self.guide.pos["spineTop"],
+                    self.guide.pos["chest"],
+                    self.guide.blades["blade"].z * -1,
+                    "yx",
+                    False)
+                scl_ref_parent = self.root
+            else:
+                t = transform.getTransform(parentctl)
+                scl_ref_parent = parentctl
+
             scl_ref = primitive.addTransform(
-                parentctl,
+                scl_ref_parent,
                 self.getName("%s_scl_ref" % i),
-                transform.getTransform(parentctl))
+                t)
 
             self.scl_transforms.append(scl_ref)
 
@@ -666,6 +665,9 @@ class Component(component.Main):
                 self.div_cns[i].attr("rotate").disconnect()
                 pm.connectAttr(blend_node + ".output",
                                self.div_cns[i] + ".rotate")
+
+        # change parent after operators applied
+        pm.parent(self.scl_transforms[-1], self.fk_ctl[-1])
 
         # Connections (Hooks) ------------------------------
         pm.parentConstraint(self.pelvis_lvl, self.cnx0)
