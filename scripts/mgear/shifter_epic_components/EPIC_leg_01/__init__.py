@@ -653,10 +653,10 @@ class Component(component.Main):
 
         applyop.oriCns(self.tws_ref, self.tws2_rot)
 
-        self.tws0_loc.setAttr("sx", .001)
-        self.tws2_loc.setAttr("sx", .001)
+        self.tws0_loc.setAttr("sx", .0)
+        self.tws2_loc.setAttr("sx", .0)
 
-        add_node = node.createAddNode(self.roundness_att, .001)
+        add_node = node.createAddNode(self.roundness_att, .0)
         pm.connectAttr(add_node + ".output", self.tws1_rot.attr("sx"))
 
         # Volume -------------------------------------------
